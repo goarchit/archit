@@ -1,0 +1,19 @@
+Known items to currently pending for one reason or another:
+
+3) 1/7/2017 - Add code to allow configuration file to override defaults ONLY if not overriden on
+command line (posted on go-flags github as an issue)
+
+Thoughts:  Build a pre-opt with just the long and short flags and no default.  Call.  Read config file.  Use IsSet() for precidence.  Call a second time with a nice description and defaults to A) process --help and B) set defaults.  Use second structure to set any previously unset values in first.
+
+--- Complete Below ---
+
+1) 1/4/2017 - Figure out how to write the viper interface out in JSON format,  Useful for both
+debugging and to save preferred startup parameters.  https://github.com/spf13/viper/pull/287
+Complete:  Switched to go-flags, too many quirks in Cobra/Viper
+
+2) 1/4/2017 - When time permits, test various hash algos and find something reasonably fast - but
+good
+Complete:  Blake2 choosen, specifically https://github.com/minio/blake2b-simd
+
+4) 1/7/2017 - Add code to figure out parse error times and print anything not Help
+Completed:  Cheated, but it works - just parsed the help message to see if it really was the help message
