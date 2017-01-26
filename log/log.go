@@ -24,22 +24,23 @@ func Setup(ll int, logfilename string, v int, resetLog bool) {
 	if resetLog {
 		os.Remove(logfilename)
 	}
-	value := "{\"filename\":\""+logfilename+"\"}"
+	value := "{\"filename\":\"" + logfilename + "\"}"
 	logger.SetLogger("file", value)
-	logLevel = ll 
+	logLevel = ll
 	verbose = v
-	if (verbose == 1) {
+	if verbose == 1 {
 		Warning("Verbosity turned on, expect to see Informational messages")
 	}
-	if (verbose == 2) {
+	if verbose == 2 {
 		Warning("VeryVerbose turned on, be prepared for a LOT of messages")
 	}
-	Info("Logging start in",logfilename)
+	Info("Logging start in", logfilename)
 }
 
 func Critical(s ...interface{}) {
 	logger.Critical(fmt.Sprint(s))
- 	panic(fmt.Sprint(s))	
+	fmt.Println("Critical Error:", s)
+	os.Exit(1)
 }
 
 func Error(s ...interface{}) {

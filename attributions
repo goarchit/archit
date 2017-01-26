@@ -1,1 +1,6 @@
 "Introducing Go" by Caleb Doxsey (O'Reilly).  Copyright 2016 Caleb Doxsey, 978-1-4919-4195-9
+"Efficient dispersal of information for security, load balancing, and fault tolerance" by Michael O. Rabin, Harvard University, Journal of the ACM, Volume 36, Issue 2, April 1989
+http://blog.notdot.net/2012/01/Damn-Cool-Algorithms-Fountain-Codes
+"RaptorQ Technical Overview - Qualcomm" - https://www.qualcomm.com/media/documents/files/raptorq-technical-overview.pdf - a good read to help get your mind around fountain coding
+RFP 6330: https://tools.ietf.org/html/rfc6330 
+and of course, the kind folks over on Stackoverflow.com: http://stackoverflow.com/questions/41774160/how-best-to-split-a-file-into-n-parts-with-m-redundant-parts-such-that-any-n-of/41782217#41782217
