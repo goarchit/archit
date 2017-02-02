@@ -132,7 +132,7 @@ func Read() {
 		if o.IsSetDefault() {
 			var ivalue int
 			log.Debug("KeyPIN value being asked of invoker")
-			fmt.Printf("Please enter you KeyPIN:")
+			fmt.Printf("Please enter you KeyPIN: ")
 			_, err := fmt.Scanf("%d", &ivalue)
 			if err != nil {
 				log.Critical("Error getting KeyPin:", err)

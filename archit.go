@@ -6,7 +6,7 @@ package main
 
 import (
 	"github.com/goarchit/archit/config"
-	//	"github.com/goarchit/archit/wallet"
+	"github.com/goarchit/archit/wallet"
 	"github.com/goarchit/archit/cmd"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/parser"
@@ -52,9 +52,11 @@ func main() {
 	log.Debug("IP(s): ", ips)
 	serverip := net.JoinHostPort(ips[0].String(), strconv.Itoa(parser.Archit.Port))
 	log.Info("Using server address", serverip)
-	//	go wallet.Server()
-	//	time.Sleep(2000 * time.Millisecond)
-	//	go server.Server(serverip)
+	walletCmd := make(chan string)
+	go wallet.Server(walletCmd)
+	walletCmd <- "status" 
+	walletCmd <- "stop"
+	// go server.Server(serverip)
 
 	//	var s, toip, filename string
 	//	for {

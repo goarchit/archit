@@ -19,7 +19,7 @@ type ArchitCommand struct {
 	ResetLog       bool   `short:"r" long:"ResetLog" description:"Reset the logfile instead of appending to it" env:"ARCHIT_RESETLOG"`
 	Verbose        bool   `short:"v" long:"Verbose" description:"Show Informational messages on the console" env:"ARCHIT_VERBOSE"`
 	VVerbose       bool   `short:"V" long:"VeryVerbose" description:"Show ALL messages, include debug if set" env:"ARCHIT_DEBUG"`
-	WalletAddr     string `"long:"WalletAddr" short:"A" description:"IMACredit Adddress for identity and transactions - !!!Do not use the default!!!" default:"9KsqKMgLjzBWCidAAdy3pNn6jwbd9BT4Te" env:"ARCHIT_WALLETADDR"`
+	WalletAddr     string `long:"WalletAddr" short:"A" description:"IMACredit Adddress for identity and transactions - !!!Do not use the default!!!" default:"9KsqKMgLjzBWCidAAdy3pNn6jwbd9BT4Te" env:"ARCHIT_WALLETADDR"`
 	WalletIP       string `long:"WalletIP" short:"I" description:"IP name or address of IMACredit Wallet.  Recommend this be set in your archit configuration file" default:"localhost" env:"ARCHIT_WALLETIP"`
 	WalletPort     string `long:"WalletPort" short:"P" description:"IMACredit Wallets's RPCPort setting." default:"64096" env:"ARCHIT_WALLETPORT"`
 	WalletUser     string `long:"WalletUser" short:"U" description:"IMACredit Wallet's RPCuser setting.  Recommend this be set in your archit configuration file" default:"ReplaceThis"`

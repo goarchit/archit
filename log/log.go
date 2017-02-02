@@ -29,48 +29,66 @@ func Setup(ll int, logfilename string, v int, resetLog bool) {
 	logLevel = ll
 	verbose = v
 	if verbose == 1 {
-		Warning("Verbosity turned on, expect to see Informational messages")
+		Console("Verbosity turned on, expect to see Informational messages")
 	}
 	if verbose == 2 {
-		Warning("VeryVerbose turned on, be prepared for a LOT of messages")
+		Console("VeryVerbose turned on, be prepared for a LOT of messages")
 	}
 	Info("Logging start in", logfilename)
 }
 
 func Critical(s ...interface{}) {
-	logger.Critical(fmt.Sprint(s))
-	fmt.Println("Critical Error:", s)
+	line := fmt.Sprint(s)
+	logger.Critical(line)
+	fmt.Println("Critical Error:", line)
 	os.Exit(1)
 }
 
 func Error(s ...interface{}) {
 	if logLevel >= 1 {
-		logger.Error(fmt.Sprint(s))
-		fmt.Println("Error:", s)
+		line := fmt.Sprint(s)
+		logger.Error(line)
+		fmt.Println("Error:", line)
 	}
 }
 
 func Warning(s ...interface{}) {
 	if logLevel >= 2 {
-		logger.Warning(fmt.Sprint(s))
-		fmt.Println("Warning:", s)
+		line := fmt.Sprint(s)
+		logger.Warning(line)
+		fmt.Println("Warning:", line)
 	}
 }
 
 func Info(s ...interface{}) {
 	if logLevel >= 3 {
-		logger.Info(fmt.Sprint(s))
+		line := fmt.Sprint(s)
+		logger.Info(line)
 		if verbose >= 1 {
-			fmt.Println(s)
+			fmt.Println(line)
 		}
 	}
 }
 
 func Debug(s ...interface{}) {
 	if logLevel >= 4 {
-		logger.Debug(fmt.Sprint(s))
+		line := fmt.Sprint(s)
+		logger.Debug(line)
 		if verbose >= 2 {
-			fmt.Println(s)
+			fmt.Println(line)
 		}
+	}
+}
+
+func Console(s ...interface{}) {
+	line := fmt.Sprint(s)
+	logger.Info(line)
+	println(line)
+}
+
+func println(line string) {
+	length := len(line)
+	if length >= 2 && line[0] == '[' && line[length-1] == ']' {
+		fmt.Println(line[1:length-1])
 	}
 }

@@ -5,13 +5,13 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/goarchit/archit/log"
 )
 
 type StartCommand struct{
 }
 
 func (ec *StartCommand) Execute(args []string) error {
-	fmt.Println("In StartCommand")
+	log.Debug("In StartCommand")
 	return nil
 }
