@@ -5,30 +5,28 @@
 package main
 
 import (
-	"github.com/goarchit/archit/config"
-	"github.com/goarchit/archit/wallet"
-	"github.com/goarchit/archit/cmd"
 	"github.com/goarchit/archit/log"
-	"github.com/goarchit/archit/parser"
+	"github.com/goarchit/archit/cmd"
+	"github.com/goarchit/archit/config"
+
 	// #include <unistd.h>
 	"C"
-	"net"
 	"runtime"
-	"strconv"
 	"time"
 	"unsafe"
 )
 
 func init() {
-	cmd.Define()  // Go define all commands
-	config.Read() // Go parse flags, env values, & config file
-	log.Debug("Wrapping up archit.init()")
+	// Note that the Parser controls all flow, it initiates and processes all commands BEFORE returning
+	// Bacially making it the next and final meaningful thing done
+	config.ParseCmdLine() // Go parse flags, env values, & config file
 }
 
 func main() {
 	const wordSize = int(unsafe.Sizeof(uintptr(0)))
+	//  All work is done via commands invoked by the parser in function init()
 	// Print some basic debug info
-	log.Debug("Starting ArchIt at ", time.Now())
+	log.Debug("Started ArchIt at ", time.Now())
 	log.Debug("Compiled with ", runtime.Version())
 	log.Debug("This system has ", runtime.NumCPU(), "cores")
 	log.Debug("Word size", wordSize)
@@ -41,48 +39,9 @@ func main() {
 
 	// Print Configuration settings
 	log.Info("Final configuration results:")
-	log.Info("Port =", parser.Archit.Port)
-	log.Info("PublicIP =", parser.Archit.PublicIP)
-	log.Debug("Looking up PublicIP...")
-	ips, err := net.LookupIP(parser.Archit.PublicIP)
-	if err != nil {
-		log.Critical("Fatal error: ", err)
-		return
-	}
-	log.Debug("IP(s): ", ips)
-	serverip := net.JoinHostPort(ips[0].String(), strconv.Itoa(parser.Archit.Port))
-	log.Info("Using server address", serverip)
-	walletCmd := make(chan string)
-	go wallet.Server(walletCmd)
-	walletCmd <- "status" 
-	walletCmd <- "stop"
-	// go server.Server(serverip)
-
-	//	var s, toip, filename string
-	//	for {
-	//		fmt.Printf("Command: ")
-	//		fmt.Scanf("%s", &s)
-	//		switch s {
-	//		case "Hi":
-	//			fmt.Println("Hello!")
-	//		case "Send":
-	//			fmt.Printf("To: ")
-	//			fmt.Scanf("%s", &toip)
-	//			fmt.Printf("Filename: ")
-	//			fmt.Scanf("%s", &filename)
-	//			go server.SendFile(toip, filename)
-	//		case "Ping":
-	//			fmt.Println("Sorry, Ping not implemented")
-	//		case "Pong":
-	//			fmt.Println("Pongs are for servers!  Not people!")
-	//		case "Exit":
-	//			fmt.Println("Bye now")
-	//			os.Exit(0)
-	//		case "Help":
-	//			fmt.Println("I understand Hi, Send, Ping, Pong, Exit, and Help")
-	//		default:
-	//			fmt.Println("Unknown command ", s)
-	//
-	//		}
-	//	}
+	log.Info("PortBase =", config.Archit.PortBase)
+	log.Info("PublicIP =", config.Archit.PublicIP)
+	log.Debug("Wrapping up archit.init()")
+	// Must invoke something in package cmd in order for all init()s to be called
+	cmd.GoodBye()
 }

@@ -1,9 +1,6 @@
 Known items to currently pending for one reason or another:
 
-3) 1/7/2017 - Add code to allow configuration file to override defaults ONLY if not overriden on
-command line (posted on go-flags github as an issue)
-
-Thoughts:  Build a pre-opt with just the long and short flags and no default.  Call.  Read config file.  Use IsSet() for precidence.  Call a second time with a nice description and defaults to A) process --help and B) set defaults.  Use second structure to set any previously unset values in first.
+5) 2/17/17 - Internal configuration code needs to be added for authentication of commands
 
 --- Complete Below ---
 
@@ -15,5 +12,11 @@ Complete:  Switched to go-flags, too many quirks in Cobra/Viper
 good
 Complete:  Blake2 choosen, specifically https://github.com/minio/blake2b-simd
 
+3) 1/7/2017 - Add code to allow configuration file to override defaults ONLY if not overriden on
+command line (posted on go-flags github as an issue)
+Complete:  Hand patched (see readme) and change accepted for future inclusion
+
+
 4) 1/7/2017 - Add code to figure out parse error times and print anything not Help
 Completed:  Cheated, but it works - just parsed the help message to see if it really was the help message
+

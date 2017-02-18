@@ -65,7 +65,7 @@ func Info(s ...interface{}) {
 		line := fmt.Sprint(s)
 		logger.Info(line)
 		if verbose >= 1 {
-			fmt.Println(line)
+			println(line)
 		}
 	}
 }
@@ -75,14 +75,16 @@ func Debug(s ...interface{}) {
 		line := fmt.Sprint(s)
 		logger.Debug(line)
 		if verbose >= 2 {
-			fmt.Println(line)
+			println(line)
 		}
 	}
 }
 
 func Console(s ...interface{}) {
 	line := fmt.Sprint(s)
-	logger.Info(line)
+	if logLevel >= 4 {
+		logger.Debug(line)
+	}
 	println(line)
 }
 

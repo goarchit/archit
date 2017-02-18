@@ -15,25 +15,28 @@ This project was inspired by the kind folks over at Storj (https://github.com/st
 1)  The project will be written primarily, if not exclusively, in the Go programming language in order to provide speed, portability, and a
 relatively bug free environment (less chances for memory leaks and assocaited environmental issues).
 
-2)  Go's inherrent ability to both multi-thread and communicate over the Internet will be heavily utilized, with an emphasis on IP 
-connectivity between distinct processes.  For instance, the environment should be able to split off network management from other core 
-features - to the point that such a service could run on a seperate machines if a farmer desired to do so.  Likewise, there should be 
-little benefit to running more than one instance of archit - that instance should take full advantage of the server its running on behave
-if restrictions are specified via confirguration (for instance, to only use 4 cores of an 8 core system).
+2)  Go's inherrent ability to both multi-thread and communicate over the Internet is heavily utilized, with an emphasis on IP 
+connectivity between distinct processes.  For instance, the environment splits off network management from other core features - to the 
+point that such a service could run on a seperate machines if that feature was enabled and a farmer desired to do so.  Likewise, there 
+is little benefit to running more than one instance of archit - that instance should take full advantage of the server its running unless
+restrictions are specified via confirguration (for instance, to only use 4 cores of an 8 core system via the GOMAXPROCS variable).
 
-3)  Self-tuning will be inherent in the code design, within the configuration limits.  e.g. issues like concurrency will be automatically
+3)  Self-tuning is an inherent code design goal, within the configuration limits.  e.g. issues like concurrency will be automatically
 adjusted over time to attempt to best utilize offered resources.
 
-4)  File stored in the archit ecosystem will have metadata search capabilities.  Files will be encrypted and broken into shards for storage 
-across multiple systems.  Files themselves will either be public or private, based on the renters desire.  This is turn would allow projects
-like the Climate Data preservation initiative to pay for storage that the world could access.
+4)  Files stored in the archit ecosystem will be sliced, encrypted, and broken into shards for storage across multiple systems.  Shards  
+will always be private and fetchable only from the renters machines (where the tracking database resides) when combined with a PIN (which is
+normally prompted for, but can be specified in a configuration file).  Archit itself will have renter side checks that prevent more than
+one shard per slide from existing on any one farmer, and will strive to distribute each shard to a seperate farmer.
 
-5)  Initial effort will be to create a linux based CLI.  However, since the project will be written in Go, a Windows port should be 
+5)  Raptor coding techniques will be utilized to provide file recovery redundancy across farmers.
+
+6)  Initial effort will be to create a linux based CLI.  However, since the project will be written in Go, a Windows port should be 
 relatively easy to provide.  Support for a GUI interface is not intended until after Alpha testing, if then.
 
-6)  This project will be invitation only/private until Beta release, when limited public support will be offered.
+7)  This project will be invitation only/private until Beta release, when limited public support will be offered.
 
-7)  This code is dependant upon one modification to the standard github.com/jessevdk/go-flags/option.go file.  Issue number #213 addresses this, but until that is mainstreamed, add:
+8)  This code is dependant upon one modification to the standard github.com/jessevdk/go-flags/option.go file.  Issue number #213 addresses this, but until that is mainstreamed (likely done by the time you read this), add:
 
 // IsSetDefault returns true if option has been set via the default tag
 func (option *Option) IsSetDefault() bool {
