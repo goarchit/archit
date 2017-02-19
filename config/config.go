@@ -43,11 +43,18 @@ func Conf(needKey bool) {
 
 	// And off to read the configuration file.  Command line parameters will need to trump
 
-	// Need to patch up ~ in the configuration file name if it starts with that.
+	// Need to patch up ~ in the configuration & log file name if it starts with that.
 	if len(Archit.Conf) >= 2 && Archit.Conf[:2] == "~/" {
 		usr, _ := user.Current()
 		dir := usr.HomeDir + "/"
 		Archit.Conf = strings.Replace(Archit.Conf, "~/", dir, 1)
+		log.Debug("Conf expanded to",Archit.Conf)
+	}
+	if len(Archit.LogFile) >= 2 && Archit.LogFile[:2] == "~/" {
+		usr, _ := user.Current()
+		dir := usr.HomeDir + "/"
+		Archit.LogFile = strings.Replace(Archit.LogFile, "~/", dir, 1)
+		log.Debug("LogFile expanded to",Archit.LogFile)
 	}
 	conf, err := goconfig.LoadConfigFile(Archit.Conf)
 	if err != nil {
@@ -87,7 +94,19 @@ func Conf(needKey bool) {
 			Archit.PublicIP = value
 		}
 	}
-	value, err = conf.GetValue("", "LogLevel")
+	value, err = conf.GetValue("", "Raptor")
+	if err == nil {
+		log.Debug("Value of Raptor from config file:", value)
+		o := Parser.FindOptionByLongName("Raptor")
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", Archit.PublicIP)
+			Archit.Raptor, err = strconv.Atoi(value)  
+			if err != nil {
+				log.Critical(err)
+			}
+		}
+	}
+	value, err = conf.GetValue("", "LogFile")
 	if err == nil {
 		log.Debug("Value of LogLevel from config file:", value)
 		o := Parser.FindOptionByLongName("LogLevel")
@@ -97,15 +116,6 @@ func Conf(needKey bool) {
 			if err != nil {
 				log.Critical(err)
 			}
-		}
-	}
-	value, err = conf.GetValue("", "LogFile")
-	if err == nil {
-		log.Debug("Value of LogFIle from config file:", value)
-		o := Parser.FindOptionByLongName("LogFile")
-		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", Archit.LogFile)
-			Archit.LogFile = value
 		}
 	}
 	if needKey {
@@ -220,6 +230,7 @@ func Conf(needKey bool) {
 		usr, _ := user.Current()
 		dir := usr.HomeDir + "/"
 		Archit.DBDir = strings.Replace(Archit.DBDir, "~/", dir, 1)
+		log.Debug("DBDir expanded to",Archit.DBDir)
 	}
 	log.Debug("Wrapping up config.Conf(needKey), needKey:", needKey)
 }

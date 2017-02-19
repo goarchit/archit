@@ -24,7 +24,7 @@ func Setup(ll int, logfilename string, v int, resetLog bool) {
 	if resetLog {
 		os.Remove(logfilename)
 	}
-	value := "{\"filename\":\"" + logfilename + "\"}"
+	value := "{\"filename\":\"" + logfilename + "\",\"perm\":\"0644\"}"
 	logger.SetLogger("file", value)
 	logLevel = ll
 	verbose = v

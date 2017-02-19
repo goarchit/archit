@@ -36,11 +36,5 @@ relatively easy to provide.  Support for a GUI interface is not intended until a
 
 7)  This project will be invitation only/private until Beta release, when limited public support will be offered.
 
-8)  This code is dependant upon one modification to the standard github.com/jessevdk/go-flags/option.go file.  Issue number #213 addresses this, but until that is mainstreamed (likely done by the time you read this), add:
-
-// IsSetDefault returns true if option has been set via the default tag
-func (option *Option) IsSetDefault() bool {
-return option.isSetDefault
-}
-
-to option.go.  Recommend placing it immediately under IsSet().
+8)  This code is dependant upon one modification to the standard github.com/btcsuite/btcutil/amount.go file:  
+    Lines 36->44 should be changed from "BTC" to "IMAC"

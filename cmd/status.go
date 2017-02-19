@@ -6,9 +6,8 @@ package cmd
 
 import (
 	"github.com/goarchit/archit/config"
-	"github.com/goarchit/archit/farmer"
+	"github.com/goarchit/archit/log"
 	"github.com/valyala/gorpc"
-	"errors"
 	"net"	
 	"strconv"
 )
@@ -23,9 +22,7 @@ func init() {
 
 func (ec *StatusCommand) Execute(args []string) error {
 	config.Conf(false)
-	if !farmer.FarmerStarted {
-		return errors.New("Farming has not been started; Please issue a 'archit farm' command")
-	}
+
 	/// Insert RPC code to query the farmer
 
 	port := config.Archit.PortBase + 1
@@ -33,6 +30,14 @@ func (ec *StatusCommand) Execute(args []string) error {
 	c := gorpc.NewTCPClient(serverIP)
 	c.Start()
 	defer c.Stop()
-	c.Call("Status")
+
+	d := gorpc.NewDispatcher()
+	d.AddFunc("Status", func() {})
+	dc := d.NewFuncClient(c)
+	response, err := dc.Call("Status", nil)
+	if err != nil {
+                log.Error("Status failed: ",err)
+        }
+	log.Console(response)
 	return nil
 }
