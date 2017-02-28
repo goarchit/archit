@@ -85,21 +85,21 @@ func Conf(needKey bool) {
 			}
 		}
 	}
-	value, err = conf.GetValue("", "PublicIP")
-	if err == nil {
-		log.Debug("Value of PublicIP from config file:", value)
-		o := Parser.FindOptionByLongName("PublicIP")
-		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", Archit.PublicIP)
-			Archit.PublicIP = value
-		}
-	}
+//	value, err = conf.GetValue("", "PublicIP")
+//	if err == nil {
+//		log.Debug("Value of PublicIP from config file:", value)
+//		o := Parser.FindOptionByLongName("PublicIP")
+//		if o.IsSetDefault() {
+//			log.Debug("Configuration value of", value, "overriding default value", Archit.PublicIP)
+//			Archit.PublicIP = value
+//		}
+//	}
 	value, err = conf.GetValue("", "Raptor")
 	if err == nil {
 		log.Debug("Value of Raptor from config file:", value)
 		o := Parser.FindOptionByLongName("Raptor")
 		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", Archit.PublicIP)
+			log.Debug("Configuration value of", value, "overriding default value", Archit.Raptor)
 			Archit.Raptor, err = strconv.Atoi(value)  
 			if err != nil {
 				log.Critical(err)

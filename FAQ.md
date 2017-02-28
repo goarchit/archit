@@ -58,3 +58,53 @@ A12) Inherrent in every interaction between a renter and a farmer is a reputatio
 Q13) How do I limit the number of cores Archit will use?
 A13) Simply set the GOMAXPROCS environment variable.  There was little point in providing this as an 
      option flag since GoLang has it built in.
+
+Q14) Can I run Archit on a Raspberry Pi
+A14) Yes, but not really.  Raspberry Pis and similar computers simply do not have the memory available
+     to run the code efficiently.  We recommend at LEAST 2GB of memory.  When we say "yes" we are being
+     technically correct, presuming you have plenty of swap space, but the program is going to run 
+     hundreds of times slower than on a machine with that much memory.
+
+Q15) Why is UPnP not supported?
+A15) This was a tough one, but the bottom line is your dealing with cyber-currency, and you should 
+     always have control over any environment with a wallet in it.  If Archit was to support UPnP,
+     folks would demand IMAC support UPnP, which we won't do for the users benefit.  Way to likely
+     someone would publish, and others would use, a common configuration file - which could then be
+     easily hacked and give IMAC a bad reputation.  Of course, even without UPnP, folks can act foolishly,
+     but we believe those that can manage their modems are likely to manage their security.
+
+     Yes, we realize this greatly reduces the number of people who might use the software, but 
+     security comes first.
+
+Q16) Can a farmer scam me of coins?
+A16) Yes, but...
+     A fundemental goal of the project is to make scamming as hard and unprofitable as possible.  For
+     instance, farmers are only provided a filename and a data shard to store.  All details around
+     which block that shard represents, keys used, who storing the shard, reputation of the farmer, 
+     etc. are stored exclusively by the renter.
+
+     Tools are planned that will allow a "trust relationship" to be built, with some responsibility
+     on the renter to behave responsibly.  Some tools will be automatic, such as random checks of
+     known farmers to assure they are pingable.  Other tools will be created to allow a farmer to
+     do some "data mining" of the reputation scores - such as the number of postively rated farmers
+     vs. negatively rated, and allow them set minimum and maximum scores to work with.  
+
+Q17) How can a farmer scam me?
+A17) Since Archit is open source, a farmer could modify the source with the implicit goal of scamming
+     renters.  For instance: they could store all data in /dev/null, destorying it the moment it
+     is written, in hopes of collecting the fees and never actually having to store anything.  
+     Fighting this type of behavior is the balance of renter responsbility and code checks. Good
+     renters will not upload massive amounts of critical data to totally unknown farmers.  Instead
+     they should join the network, and perhaps upload some short term data in order to start
+     building a farmer reputation matrix - and gradually favor those farmers that have proven 
+     themselves.  Likewise, a good renter will spend some trivial amount of coins to audit farmers,
+     randomly pulling shards and checking their authentication codes.  Code checks will be
+     implemented to make it troublesome to run multiple farming nodes on the same server.  Alas,
+     depending on the verosity of the scammer farmer, any farm side checks could be disabled,
+     which leads us back to renter caution.  Code checks will be added when doing so will likely
+     prevent classes of non-coding scammers from being successful, which should help.
+
+Q18) Why would I not ALWAYS want to send my shards to the highest rated farmers?
+A18) It is in a renters best interest to spread their data across as many reasonable farmers as 
+     possible.  Doing so reduces the risk of having to recover multiple files due to a single (the
+     farmer with the best reputation?) going offline.

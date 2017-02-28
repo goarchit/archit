@@ -37,10 +37,6 @@ func main() {
 		log.Error(memSize, "MB of memory detected.  This program utilizes 1GB+ memory arrays.  Running on a system with less than 2GB of real memory will likely cause severe system performance impact")
 	}
 
-	// Print Configuration settings
-	log.Info("Final configuration results:")
-	log.Info("PortBase =", config.Archit.PortBase)
-	log.Info("PublicIP =", config.Archit.PublicIP)
 	log.Debug("Wrapping up archit.init()")
 	// Must invoke something in package cmd in order for all init()s to be called
 	cmd.GoodBye()
