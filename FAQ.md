@@ -41,7 +41,7 @@ A10) Yes, currently hosted at http://farmbase.carpenter-farms.us:3000, plans are
 Q11) What is this "Raptor" setting?
 A11) Rator (short for Rapid Tornado) is a class of fountain codes that is used by Archit to provide
      storage redundancy.  Basically a file is broken into ~1GB slices, which are then further broken
-     into (32) ~32GB shards.   Encodeing is done such that there is a >99% chance the file could be 
+     into (32) ~32MB shards.   Encodeing is done such that there is a >99% chance the file could be 
      decoded using just those (32) shards.  Extra shards are generated to improve that possibility of
      a successful decode and reconstruction.  With just (2) extra shards, the chance of failure jumps 
      from <1% to less than one-in-a-million - presuming those 32+2 shards are fetchable.  Archit defaults

@@ -1,0 +1,14 @@
+Hashing:  Converting a long string into a short one.  Good hash algorithms will dramatically change
+the results even if a single bit is change in the source string.
+Blake2B:  The hashing algorithm used to create a unique 128 byte string for every 1GB file slice
+File Slice:  A 1GB portion of a file desiring uploading to the network
+File:  A source input file broken in File Slices
+RaptorQ:  A forward error correcting code (FEC) formalized by the Internet Engineering Task Force 
+(IETF)in RFC 6330.  This code was inspirational in designing the FEC used by Archit
+Source block:  One of 32 blocks a File Slice is broken into
+Source symbol: An encoded portion of a source block.  RaptorQ's is limited to 56403 source symbols 
+per source block with each symbol limited to 64KB in size.  This exceeds our target 32MB source block 
+size by over 100X.
+Transfer Length: size of a complete file slice, after all headers are included.  RFC 6330 limits this
+to ~881GB, which might not meet our needs, which is why files are sliced instead of transmitted whole.
+
