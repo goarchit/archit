@@ -9,7 +9,6 @@ import (
 	"github.com/Unknwon/goconfig"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
-	"github.com/kabukky/httpscerts"
 	"golang.org/x/crypto/scrypt"
 	"net"
 	"os"
@@ -50,13 +49,13 @@ func Conf(needKey bool) {
 		usr, _ := user.Current()
 		dir := usr.HomeDir + "/"
 		Archit.Conf = strings.Replace(Archit.Conf, "~/", dir, 1)
-		log.Debug("Conf expanded to",Archit.Conf)
+		log.Debug("Conf expanded to", Archit.Conf)
 	}
 	if len(Archit.LogFile) >= 2 && Archit.LogFile[:2] == "~/" {
 		usr, _ := user.Current()
 		dir := usr.HomeDir + "/"
 		Archit.LogFile = strings.Replace(Archit.LogFile, "~/", dir, 1)
-		log.Debug("LogFile expanded to",Archit.LogFile)
+		log.Debug("LogFile expanded to", Archit.LogFile)
 	}
 	conf, err := goconfig.LoadConfigFile(Archit.Conf)
 	if err != nil {
@@ -93,7 +92,7 @@ func Conf(needKey bool) {
 		o := Parser.FindOptionByLongName("Raptor")
 		if o.IsSetDefault() {
 			log.Debug("Configuration value of", value, "overriding default value", Archit.Raptor)
-			Archit.Raptor, err = strconv.Atoi(value)  
+			Archit.Raptor, err = strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
 			}
@@ -224,7 +223,7 @@ func Conf(needKey bool) {
 		usr, _ := user.Current()
 		dir := usr.HomeDir + "/"
 		Archit.DBDir = strings.Replace(Archit.DBDir, "~/", dir, 1)
-		log.Debug("DBDir expanded to",Archit.DBDir)
+		log.Debug("DBDir expanded to", Archit.DBDir)
 	}
 	value, err = conf.GetValue("", "Chaos")
 	if err == nil {
@@ -236,21 +235,18 @@ func Conf(needKey bool) {
 		}
 	}
 	// Go out and determine our public IP address
-	util.ServerIP = net.JoinHostPort(util.GetExtIP(),strconv.Itoa(Archit.PortBase))
+	util.ServerIP = net.JoinHostPort(util.GetExtIP(), strconv.Itoa(Archit.PortBase))
 	// Build the encryption Matrix
-	util.BuildMatrix()	
+	util.BuildMatrix()
 	// Make sure we have valud certification files
-	cert := Archit.DBDir+"/cert.pem"
-	key := Archit.DBDir+"/key.pem"
+	private := Archit.DBDir + "/Private"
+	public := Archit.DBDir + "/Public"
 	// Check if cert files are available
-	err = httpscerts.Check(cert,key)
+	err = util.RSACheck(private, public)
 	// If they are not, generate new ones
 	if err != nil {
-		log.Console("Generating security certifications files")
-		err = httpscerts.Generate(cert,key,util.ServerIP)
-		if err != nil {
-			log.Critical("Error creating certification files:",err)
-		}
+		log.Console("Generating security keys")
+		util.RSAGenerate(private,public)
 	}
 	log.Debug("Wrapping up config.Conf(needKey), needKey:", needKey)
 }

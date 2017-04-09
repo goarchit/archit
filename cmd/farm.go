@@ -6,21 +6,21 @@ package cmd
 
 import (
 	"github.com/goarchit/archit/config"
-	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/farmer"
+	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
+	"io/ioutil"
 	"os"
 	"os/signal"
-	"io/ioutil"
 	"strconv"
 )
 
-type FarmCommand struct{
+type FarmCommand struct {
 }
 
 func init() {
 	farmCmd := FarmCommand{}
-        config.Parser.AddCommand("farm","Starts the ArchIt farming & wallet servers[Free]", "", &farmCmd)
+	config.Parser.AddCommand("farm", "Starts the ArchIt farming & wallet servers[Free]", "", &farmCmd)
 }
 
 func (ec *FarmCommand) Execute(args []string) error {
@@ -31,11 +31,11 @@ func (ec *FarmCommand) Execute(args []string) error {
 		log.Critical(err)
 	}
 	log.Console("Starting Farmer node... Ctrl-C to stop or kill pid", pid)
-	go farmer.Run(util.FarmerStop)   //  Loops forever waiting on incomming web request
+	go farmer.Run(util.FarmerStop) //  Loops forever waiting on incomming web request
 	//  Wait for a Ctrl-C
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	<-c  
+	<-c
 	log.Console("\nTrying a clean shutdown")
 	util.FarmerStop <- true
 	return nil

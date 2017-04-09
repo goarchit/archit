@@ -6,7 +6,7 @@ package util
 
 import (
 	"github.com/goarchit/archit/log"
-        "github.com/minio/blake2b-simd"
+	"github.com/minio/blake2b-simd"
 	"io"
 )
 

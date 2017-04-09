@@ -101,6 +101,6 @@ func Console(s ...interface{}) {
 func println(line string) {
 	length := len(line)
 	if length >= 2 && line[0] == '[' && line[length-1] == ']' {
-		fmt.Println(line[1:length-1])
+		fmt.Println(line[1 : length-1])
 	}
 }

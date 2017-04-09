@@ -5,10 +5,10 @@
 package server
 
 import (
+	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
-	"fmt"
 	"time"
 )
 

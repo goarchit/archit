@@ -7,6 +7,7 @@ package util
 import (
 	"sync"
 )
+
 const MaxRaptor int = 12
 const ShardLen int = 1024
 
@@ -19,4 +20,4 @@ var FarmerStop chan bool
 
 func init() {
 	FarmerStop = make(chan bool)
-}	
+}

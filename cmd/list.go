@@ -9,12 +9,12 @@ import (
 	"github.com/goarchit/archit/log"
 )
 
-type ListCommand struct{
+type ListCommand struct {
 }
 
 func init() {
 	listCmd := ListCommand{}
-        config.Parser.AddCommand("list","List files stored in Archit network[Free]", "", &listCmd)
+	config.Parser.AddCommand("list", "List files stored in Archit network[Free]", "", &listCmd)
 }
 
 func (ec *ListCommand) Execute(args []string) error {

@@ -22,73 +22,73 @@ func Run(c chan bool) {
 
 	// Start common services
 	go server.Wallet(walletCmd)
-        go server.DB(dbCmd)
+	go server.DB(dbCmd)
 
 	// External RPC service first
 	// Start by registering fucntions and types
 	gorpc.RegisterType(&Peer{})
-	extRPC.AddFunc("Ping", func() string {return "Pong!"})
-	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(pi)})
-	extRPC.AddFunc("PeerRequest", func(p *Peer) error {return PeerRequest(p)})
+	extRPC.AddFunc("Ping", func() string { return "Pong!" })
+	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
+	extRPC.AddFunc("PeerRequest", func(p *Peer) error { return PeerRequest(p) })
 
 	// Then launch the server
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(config.Archit.PortBase))
-        log.Info("Farmer External RPC Server using server address", serverIP)
- 	extCmd = gorpc.NewTCPServer(serverIP,extRPC.NewHandlerFunc())
+	log.Info("Farmer External RPC Server using server address", serverIP)
+	extCmd = gorpc.NewTCPServer(serverIP, extRPC.NewHandlerFunc())
 	extCmd.OnConnect = newOnConnectFunc()
 	err := extCmd.Start()
 	if err != nil {
-		log.Critical("Farmer External RPC service failed to start: ",err)
+		log.Critical("Farmer External RPC service failed to start: ", err)
 	}
 
-        defer extCmd.Stop()
+	defer extCmd.Stop()
 
 	// Internal RCP service next
 	// Start by registering functions and types
-	intRPC.AddFunc("Ping", func() string {return "Pong!"})
-	intRPC.AddFunc("Status", func() string {return Status()})
+	intRPC.AddFunc("Ping", func() string { return "Pong!" })
+	intRPC.AddFunc("Status", func() string { return Status() })
 	// intRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(wa,p)})
-	intRPC.AddFunc("PeerDelete", func(p *Peer) error {return PeerDelete(p)})
-	intRPC.AddFunc("PeerListAll", func() *PeerList {return PeerListAll()})
+	intRPC.AddFunc("PeerDelete", func(p *Peer) error { return PeerDelete(p) })
+	intRPC.AddFunc("PeerListAll", func() *PeerList { return PeerListAll() })
 
 	// Then launch the server
 	port := config.Archit.PortBase + 1
-        serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
-        log.Info("Farmer Internal RPC Server using server address", serverIP)
- 	intCmd = gorpc.NewTCPServer(serverIP,intRPC.NewHandlerFunc())
+	serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
+	log.Info("Farmer Internal RPC Server using server address", serverIP)
+	intCmd = gorpc.NewTCPServer(serverIP, intRPC.NewHandlerFunc())
 	err = intCmd.Start()
 	if err != nil {
-		log.Critical("Farmer Internal RPC service failed to start: ",err)
+		log.Critical("Farmer Internal RPC service failed to start: ", err)
 	}
-        defer intCmd.Stop()
+	defer intCmd.Stop()
 
 	// Tell the world we are alive
 	go announce()
 
 	// Wait until told told to stop
-	<- c
+	<-c
 	log.Info("Farmer shutting down")
 
- 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-        s.Color("red")
-        s.Reverse()
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Color("red")
+	s.Reverse()
 
 	log.Console("Trying to stop Wallet...")
-        s.Start()
+	s.Start()
 	select {
-                case walletCmd <- "stop":
-                        s.Stop()
-                case <- time.After(5 * time.Second):
-                        s.Stop()
-                        log.Console("Wallet timed out - probably wasn't running.")
-        }
-        log.Console("Trying to stop Databases...")
-        s.Start()
-        select {
-                case dbCmd <- "stop":
-                        s.Stop()
-                case <- time.After(5 * time.Second):
-                        s.Stop()
-                        log.Console("Database(s) timed out - probably were not running.")
-        }
+	case walletCmd <- "stop":
+		s.Stop()
+	case <-time.After(5 * time.Second):
+		s.Stop()
+		log.Console("Wallet timed out - probably wasn't running.")
+	}
+	log.Console("Trying to stop Databases...")
+	s.Start()
+	select {
+	case dbCmd <- "stop":
+		s.Stop()
+	case <-time.After(5 * time.Second):
+		s.Stop()
+		log.Console("Database(s) timed out - probably were not running.")
+	}
 }

@@ -6,16 +6,16 @@ package cmd
 
 import (
 	"github.com/goarchit/archit/config"
-	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/db"
+	"github.com/goarchit/archit/log"
 )
 
-type DbStatusCommand struct{
+type DbStatusCommand struct {
 }
 
 func init() {
 	dbstatusCmd := DbStatusCommand{}
-        config.Parser.AddCommand("dbstatus","Shows the status of the renters database", "", &dbstatusCmd)
+	config.Parser.AddCommand("dbstatus", "Shows the status of the renters database", "", &dbstatusCmd)
 }
 
 func (ec *DbStatusCommand) Execute(args []string) error {

@@ -9,12 +9,12 @@ import (
 	"github.com/goarchit/archit/log"
 )
 
-type GetCommand struct{
+type GetCommand struct {
 }
 
 func init() {
 	getCmd := GetCommand{}
-        config.Parser.AddCommand("get","Retrieve a file from the Archit network[Fee!]", "", &getCmd)
+	config.Parser.AddCommand("get", "Retrieve a file from the Archit network[Fee!]", "", &getCmd)
 }
 
 func (ec *GetCommand) Execute(args []string) error {

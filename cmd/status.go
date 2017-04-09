@@ -8,16 +8,16 @@ import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/valyala/gorpc"
-	"net"	
+	"net"
 	"strconv"
 )
 
-type StatusCommand struct{
+type StatusCommand struct {
 }
 
 func init() {
 	statusCmd := StatusCommand{}
-        config.Parser.AddCommand("status","Shows the status of the ArchIt farming & wallet servers[Free]", "", &statusCmd)
+	config.Parser.AddCommand("status", "Shows the status of the ArchIt farming & wallet servers[Free]", "", &statusCmd)
 }
 
 func (ec *StatusCommand) Execute(args []string) error {
@@ -36,8 +36,8 @@ func (ec *StatusCommand) Execute(args []string) error {
 	dc := d.NewFuncClient(c)
 	response, err := dc.Call("Status", nil)
 	if err != nil {
-                log.Error("Status failed: ",err)
-        }
+		log.Error("Status failed: ", err)
+	}
 	log.Console(response)
 	return nil
 }

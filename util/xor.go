@@ -13,7 +13,7 @@ const supportsUnaligned = runtime.GOARCH == "386" || runtime.GOARCH == "amd64" |
 
 // fastXORBytes xors in bulk. It only works on architectures that
 // support unaligned read/writes.
-func fastXORBytes(dst, b []byte ) int {
+func fastXORBytes(dst, b []byte) int {
 	n := len(b)
 
 	w := n / wordSize
@@ -44,6 +44,7 @@ func safeXORBytes(dst, b []byte) int {
 // xorBytes xors the bytes in a and b. The destination is assumed to have enough
 // space. Returns the number of bytes xor'd.
 var warnonce bool
+
 func XorBytes(dst, b []byte) int {
 	if supportsUnaligned {
 		return fastXORBytes(dst, b)

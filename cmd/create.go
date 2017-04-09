@@ -9,12 +9,12 @@ import (
 	"github.com/goarchit/archit/log"
 )
 
-type CreateCommand struct{
+type CreateCommand struct {
 }
 
 func init() {
 	createCmd := CreateCommand{}
-        config.Parser.AddCommand("create","Interactively create/edit your configuration file[Free]", "", &createCmd)
+	config.Parser.AddCommand("create", "Interactively create/edit your configuration file[Free]", "", &createCmd)
 }
 
 func (ec *CreateCommand) Execute(args []string) error {

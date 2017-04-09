@@ -5,8 +5,8 @@
 package util
 
 import (
-	"github.com/goarchit/archit/log"
 	"bytes"
+	"github.com/goarchit/archit/log"
 	"net/http"
 	"time"
 )
@@ -14,7 +14,7 @@ import (
 func GetExtIP() string {
 	// Go fetch our External IP address
 	resp, err := http.Get("http://myexternalip.com/raw")
-        if err != nil {
+	if err != nil {
 		log.Console("Problem getting PublicIP Address, retrying in 1 second")
 		time.Sleep(1 * time.Second)
 		resp, err = http.Get("http://myexternalip.com/raw")
@@ -28,15 +28,15 @@ func GetExtIP() string {
 				resp, err = http.Get("http://myexternalip.com/raw")
 				if err != nil {
 					log.Console("Internet access is unreliable, shutting down")
-                			log.Critical(err)
+					log.Critical(err)
 				}
 			}
 		}
-		
-        }
-        defer resp.Body.Close()
-        buf := new(bytes.Buffer)
-        buf.ReadFrom(resp.Body)
+
+	}
+	defer resp.Body.Close()
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
 	s := buf.String()
-	return s[0:len(s)-1]
+	return s[0 : len(s)-1]
 }

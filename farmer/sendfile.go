@@ -1,9 +1,9 @@
 package farmer
 
 import (
-	"github.com/goarchit/archit/log"
-	"encoding/binary"
 	"bufio"
+	"encoding/binary"
+	"github.com/goarchit/archit/log"
 	"io"
 	"net"
 	"os"

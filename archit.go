@@ -5,9 +5,9 @@
 package main
 
 import (
-	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/cmd"
 	"github.com/goarchit/archit/config"
+	"github.com/goarchit/archit/log"
 
 	// #include <unistd.h>
 	"C"

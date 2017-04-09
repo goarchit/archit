@@ -8,16 +8,16 @@ import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/valyala/gorpc"
-	"net"	
+	"net"
 	"strconv"
 )
 
-type PingCommand struct{
+type PingCommand struct {
 }
 
 func init() {
 	pingCmd := PingCommand{}
-        config.Parser.AddCommand("ping","Pings the farming service[Free]", "", &pingCmd)
+	config.Parser.AddCommand("ping", "Pings the farming service[Free]", "", &pingCmd)
 }
 
 func (ec *PingCommand) Execute(args []string) error {
@@ -25,7 +25,7 @@ func (ec *PingCommand) Execute(args []string) error {
 
 	/// Insert RPC code to query the farmer
 
-	port := config.Archit.PortBase 
+	port := config.Archit.PortBase
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	c := gorpc.NewTCPClient(serverIP)
 	c.Start()
@@ -36,8 +36,8 @@ func (ec *PingCommand) Execute(args []string) error {
 	dc := d.NewFuncClient(c)
 	resp, err := dc.Call("Ping", nil)
 	if err != nil {
-		log.Error("Ping failed: ",err)
+		log.Error("Ping failed: ", err)
 	}
-	log.Console("Farmer process responded: ",resp)
+	log.Console("Farmer process responded: ", resp)
 	return nil
 }

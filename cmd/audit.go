@@ -9,14 +9,13 @@ import (
 	"github.com/goarchit/archit/log"
 )
 
-type AuditCommand struct{
+type AuditCommand struct {
 }
 
 func init() {
 	auditCmd := AuditCommand{}
-        config.Parser.AddCommand("audit","Perform various Archit network auditing tasks[Fee!]", "", &auditCmd)
+	config.Parser.AddCommand("audit", "Perform various Archit network auditing tasks[Fee!]", "", &auditCmd)
 }
-
 
 func (ec *AuditCommand) Execute(args []string) error {
 	config.Conf(true)

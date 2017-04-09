@@ -9,12 +9,12 @@ import (
 	"github.com/goarchit/archit/log"
 )
 
-type ConfigCommand struct{
+type ConfigCommand struct {
 }
 
 func init() {
 	configCmd := ConfigCommand{}
-        config.Parser.AddCommand("config","Displays your current configuration file[Free]", "", &configCmd)
+	config.Parser.AddCommand("config", "Displays your current configuration file[Free]", "", &configCmd)
 }
 
 func (ec *ConfigCommand) Execute(args []string) error {
