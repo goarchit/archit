@@ -34,7 +34,7 @@ func main() {
 	memSize := C.sysconf(C._SC_PHYS_PAGES) * C.sysconf(C._SC_PAGE_SIZE) / (1024 * 1024)
 	log.Debug("System Memory", memSize, "MB")
 	if memSize < 2048 {
-		log.Error(memSize, "MB of memory detected.  This program utilizes 1GB+ memory arrays.  Running on a system with less than 2GB of real memory will likely cause severe system performance impact")
+		log.Error(memSize, "MB of memory detected.  This program utilizes 2GB+ memory arrays.  Running on a system with less than 2.5GB of real memory will likely cause severe system performance impact as you swap to death")
 	}
 
 	log.Debug("Wrapping up archit.init()")

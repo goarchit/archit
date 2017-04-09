@@ -108,3 +108,5 @@ Q18) Why would I not ALWAYS want to send my shards to the highest rated farmers?
 A18) It is in a renters best interest to spread their data across as many reasonable farmers as 
      possible.  Doing so reduces the risk of having to recover multiple files due to a single (the
      farmer with the best reputation?) going offline.
+Q19) Why does Archit generate certification files?
+A19) This is a one time thing and required if your public IP ever changes.

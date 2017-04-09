@@ -2,7 +2,6 @@ package farmer
 
 import (
 	"github.com/goarchit/archit/log"
-//	"github.com/valyala/gorpc"
 )
 
 func Status () string {

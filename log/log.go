@@ -80,6 +80,16 @@ func Debug(s ...interface{}) {
 	}
 }
 
+func Trace(s ...interface{}) {
+	if logLevel >= 5 {
+		line := fmt.Sprint(s)
+		logger.Trace(line)
+		if verbose >= 2 {
+			println(line)
+		}
+	}
+}
+
 func Console(s ...interface{}) {
 	line := fmt.Sprint(s)
 	if logLevel >= 4 {

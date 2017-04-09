@@ -8,14 +8,16 @@ import (
 	"fmt"
 	"github.com/Unknwon/goconfig"
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
+	"github.com/kabukky/httpscerts"
 	"golang.org/x/crypto/scrypt"
+	"net"
 	"os"
 	"os/user"
 	"strconv"
 	"strings"
 )
 
-var DerivedKey string
 var clfirst bool = false
 
 func ParseCmdLine() {
@@ -85,15 +87,6 @@ func Conf(needKey bool) {
 			}
 		}
 	}
-//	value, err = conf.GetValue("", "PublicIP")
-//	if err == nil {
-//		log.Debug("Value of PublicIP from config file:", value)
-//		o := Parser.FindOptionByLongName("PublicIP")
-//		if o.IsSetDefault() {
-//			log.Debug("Configuration value of", value, "overriding default value", Archit.PublicIP)
-//			Archit.PublicIP = value
-//		}
-//	}
 	value, err = conf.GetValue("", "Raptor")
 	if err == nil {
 		log.Debug("Value of Raptor from config file:", value)
@@ -106,6 +99,7 @@ func Conf(needKey bool) {
 			}
 		}
 	}
+	util.Raptor = Archit.Raptor
 	value, err = conf.GetValue("", "LogFile")
 	if err == nil {
 		log.Debug("Value of LogLevel from config file:", value)
@@ -162,11 +156,11 @@ func Conf(needKey bool) {
 
 		}
 		// Generate and save DevivedKey
-		DerivedKey, err := scrypt.Key([]byte(Archit.KeyPass), []byte(strconv.Itoa(Archit.KeyPIN)), 32768, 16, 2, 32)
+		util.DerivedKey, err = scrypt.Key([]byte(Archit.KeyPass), []byte(strconv.Itoa(Archit.KeyPIN)), 16384, 8, 1, 32)
 		if err != nil {
 			log.Critical("Error encrypting KeyPass:", err)
 		}
-		log.Debug("DerivedKey: ", DerivedKey)
+		log.Trace("DerivedKey: ", util.DerivedKey, "len=", len(util.DerivedKey))
 	}
 	value, err = conf.GetValue("", "WalletAddr")
 	if err == nil {
@@ -231,6 +225,32 @@ func Conf(needKey bool) {
 		dir := usr.HomeDir + "/"
 		Archit.DBDir = strings.Replace(Archit.DBDir, "~/", dir, 1)
 		log.Debug("DBDir expanded to",Archit.DBDir)
+	}
+	value, err = conf.GetValue("", "Chaos")
+	if err == nil {
+		log.Debug("Chaos found in configuration file")
+		o := Parser.FindOptionByLongName("Chaos")
+		if o.IsSetDefault() {
+			log.Debug("Chaos set to True via configuration file")
+			Archit.Chaos = true
+		}
+	}
+	// Go out and determine our public IP address
+	util.ServerIP = net.JoinHostPort(util.GetExtIP(),strconv.Itoa(Archit.PortBase))
+	// Build the encryption Matrix
+	util.BuildMatrix()	
+	// Make sure we have valud certification files
+	cert := Archit.DBDir+"/cert.pem"
+	key := Archit.DBDir+"/key.pem"
+	// Check if cert files are available
+	err = httpscerts.Check(cert,key)
+	// If they are not, generate new ones
+	if err != nil {
+		log.Console("Generating security certifications files")
+		err = httpscerts.Generate(cert,key,util.ServerIP)
+		if err != nil {
+			log.Critical("Error creating certification files:",err)
+		}
 	}
 	log.Debug("Wrapping up config.Conf(needKey), needKey:", needKey)
 }
