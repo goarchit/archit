@@ -20,22 +20,22 @@ import (
 
 func RSACheck(private, public string) error {
 	if _, err := os.Stat(private+".key"); os.IsNotExist(err) {
-		log.Debug(private+".key","file missing, recreating"
+		log.Debug(private+".key","file missing, recreating")
 		cleanup(private, public)
 		return err
 	} 
 	if _, err := os.Stat(private+".pem"); os.IsNotExist(err) {
-		log.Debug(private+".pem","file missing, recreating"
+		log.Debug(private+".pem","file missing, recreating")
 		cleanup(private, public)
 		return err
 	} 
 	if _, err := os.Stat(public+".key"); os.IsNotExist(err) {
-		log.Debug(public+".key","file missing, recreating"
+		log.Debug(public+".key","file missing, recreating")
 		cleanup(private, public)
 		return err
 	}
 	if _, err := os.Stat(public+".pem"); os.IsNotExist(err) {
-		log.Debug(public+".pem","file missing, recreating"
+		log.Debug(public+".pem","file missing, recreating")
 		cleanup(private, public)
 		return err
 	}
