@@ -26,10 +26,10 @@ func Run(c chan bool) {
 
 	// External RPC service first
 	// Start by registering fucntions and types
-	gorpc.RegisterType(&Peer{})
+	// gorpc.RegisterType(&Peer{})
 	extRPC.AddFunc("Ping", func() string { return "ePong!" })
 	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
-	extRPC.AddFunc("PeerListAll", func() *PeerList { return PeerListAll() })
+	extRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 
 	// Then launch the server
 	serverIP := ":" + strconv.Itoa(config.Archit.PortBase) // Listen on all interfaces
@@ -49,7 +49,7 @@ func Run(c chan bool) {
 	intRPC.AddFunc("Status", func() string { return Status() })
 	// intRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(wa,p)})
 	intRPC.AddFunc("PeerDelete", func(p *Peer) error { return PeerDelete(p) })
-	intRPC.AddFunc("PeerListAll", func() *PeerList { return PeerListAll() })
+	intRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 
 	// Then launch the server
 	port := config.Archit.PortBase + 1

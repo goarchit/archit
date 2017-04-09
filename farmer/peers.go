@@ -1,8 +1,10 @@
 package farmer
 
 import (
-	"errors"
 	"github.com/goarchit/archit/log"
+	"bytes"
+	"encoding/gob"
+	"errors"
 	"net"
 	"strconv"
 	"sync"
@@ -43,7 +45,7 @@ func PeerAdd(pi *PeerInfo) error {
 	}
 	val, found := PeerMap.PL[pi.WalletAddr]
 	if found {
-		log.Console("Peer", pi.WalletAddr, "attempting to re-add")
+		log.Console("Peer", pi.WalletAddr, "entering network")
 		if val.IPAddr != pi.Detail.IPAddr {
 			log.Warning("Peer", pi.WalletAddr, "IP has changed!  Old=", val.IPAddr,
 				"New=", pi.Detail.IPAddr)
@@ -88,8 +90,14 @@ func PeerDelete(p *Peer) error {
 	return nil
 }
 
-func PeerListAll() *PeerList {
-	return &PeerMap.PL
+func PeerListAll() string {
+	var encBuf bytes.Buffer
+	enc := gob.NewEncoder(&encBuf)
+	err := enc.Encode(&PeerMap.PL)
+	if err != nil {
+		log.Critical("PeerListAll Encode err:",err)
+	}
+	return encBuf.String()
 }
 
 func peerListAdd(pl PeerList) {

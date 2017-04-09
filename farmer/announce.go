@@ -1,11 +1,13 @@
 package farmer
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
+	"bytes"
 	"net"
 	"sync"
 )
@@ -44,6 +46,9 @@ func announce() {
 }
 
 func tellSeed(pi *PeerInfo,serverIP string) {
+
+	var newPL PeerList
+
 	c := gorpc.NewTCPClient(serverIP)
 	c.Start()
 	defer c.Stop()
@@ -57,11 +62,21 @@ func tellSeed(pi *PeerInfo,serverIP string) {
 		log.Warning("Accounce to seed", serverIP, "failed:", err)
 	} else {
 		FoundSeed = true
-		pl, err := dc.Call("PeerListAll", nil)
+		s, err := dc.Call("PeerListAll",nil)
 		if err != nil {
 			log.Warning("Attempt to get PeerList from seed", serverIP, "failed:", err)
 		} else {
-			peerListAdd(pl.(PeerList))
+			str, ok := s.(string)
+			if !ok {
+				log.Critical("Tellseed: dc.call(PeerListAll) did not return a string")
+			}
+			buf := bytes.NewBufferString(str)
+			dec := gob.NewDecoder(buf)
+			err = dec.Decode(&newPL)
+			if err != nil {
+				log.Critical("Tellseed:  Error decoding PeerMap:",err)
+			}	
+			peerListAdd(newPL)
 		}
 	}
 }
