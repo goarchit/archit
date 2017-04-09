@@ -38,6 +38,6 @@ func main() {
 	}
 
 	log.Debug("Wrapping up archit.init()")
-	// Must invoke something in package cmd in order for all init()s to be called
-	cmd.GoodBye()
+	// Must invoke something in package cmd in order for Go to load the package
+	cmd.Startup = true
 }

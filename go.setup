@@ -1,4 +1,0 @@
-To install:  http://ask.xmodulo.com/install-go-language-linux.html
-To define your workspace:  https://golang.org/doc/code.html
-For now... try "go install archit" in ./archit.  You will likely get a lot of unresolved 
-references like github.com/userx/proga.  For each do a "go get github.com/userx/proga" to resolve

@@ -16,11 +16,18 @@ import (
 )
 
 type SendCommand struct {
+ 	Chaos 	bool   `short:"C" long:"Chaos" description:"Add a check for a random bit flip (chaos bit) after encoding and decoding - this doubles the computational load for sending data    and normally is seldom needed" env:"ARCHIT_CHAOS"`
+	Raptor  int    `short:"R" long:"Raptor" description:"Raptor factor - how many extra    fountain blocks to generate (4-12)" default:"8" env:"ARCHIT_RAPTOR" choice:"4" choice:"5" choice:"6" choice:"7" choice:"8" choice:"9" choice:"10" choice:"11" choice:"12"`
+	KeyPass string `short:"k" long:"KeyPass" description:"Your Key Passphase.  Recommend this be set in your archit configuration file" default:"insecure" env:"ARCHIT_KEYPASS"`
+        KeyPIN  int    `short:"n" long:"KeyPIN" description:"Your personal identificatio number, used to encrypt KeyPass" default:"0" env:"ARCHIT_KEYPIN"`
+
 }
 
+var sendCmd SendCommand
+
 func init() {
-	sendCmd := SendCommand{}
-	config.Parser.AddCommand("send", "Send a file to the Archit network[Fee!]", "", &sendCmd)
+	config.Parser.AddCommand("send", "Send a file [Fee!]", 
+		"Sends a file to the Archit network.  This cost IMAC to perform.  Use -C to add extra checks (rarely needed)", &sendCmd)
 }
 
 func (ec *SendCommand) Execute(args []string) error {

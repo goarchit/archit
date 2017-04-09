@@ -40,7 +40,7 @@ func Setup(ll int, logfilename string, v int, resetLog bool) {
 func Critical(s ...interface{}) {
 	line := fmt.Sprint(s)
 	logger.Critical(line)
-	//fmt.Println("Critical Error:", line)
+	fmt.Println("Critical Error:", line)
 	os.Exit(1)
 }
 

@@ -30,13 +30,16 @@ func ParseCmdLine() {
 			log.Debug("Help called.  Saw:", err)
 			os.Exit(0)
 		}
+		if strings.Contains(err.Error(), "Please specify one command") {
+			log.Debug("No comamnds or options specified.  Saw:", err)
+			os.Exit(0)
+		}
+		fmt.Println("***Internal Parsing structure error: ",err,"***")
 		os.Exit(1)
 	}
 }
 
 func Conf(needKey bool) {
-
-	var verbose int = 0
 
 	if !clfirst {
 		log.Critical("config.Conf called before config.ParsedCmdLine")
@@ -59,18 +62,17 @@ func Conf(needKey bool) {
 	}
 	conf, err := goconfig.LoadConfigFile(Archit.Conf)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		// Something is wrong, generate a good configuration file
+		genGoodConfig()
+		conf, err = goconfig.LoadConfigFile(Archit.Conf)
+		if err != nil {
+			log.Critical("Something is seriously wrong:",err)
+		}
 	}
 
+
 	// Initialize log system and write Informational messages
-	if Archit.Verbose {
-		verbose = 1
-	}
-	if Archit.VVerbose {
-		verbose = 2
-	}
-	log.Setup(Archit.LogLevel, Archit.LogFile, verbose, Archit.ResetLog)
+	log.Setup(Archit.LogLevel, Archit.LogFile, Archit.Verbose, Archit.ResetLog)
 
 	// Start checking if the configuration file has a setting, and if a f;ag was set bu
 	// default, override with configuration file
@@ -111,23 +113,22 @@ func Conf(needKey bool) {
 			}
 		}
 	}
-	if needKey {
-		value, err = conf.GetValue("", "KeyPass")
-		if err == nil {
-			log.Debug("Value of KeyPass from config file:", value)
-			o := Parser.FindOptionByLongName("KeyPass")
-			if o.IsSetDefault() {
-				log.Debug("Configuration value of", value, "overriding default value", Archit.KeyPass)
-				Archit.KeyPass = value
-			}
-		} else {
-			log.Debug("KeyPass value NOT specified by config file")
-			o := Parser.FindOptionByLongName("KeyPass")
-			if o.IsSetDefault() {
-				log.Critical("KeyPass value must be set!")
-			}
-
+	value, err = conf.GetValue("", "KeyPass")
+	if err == nil {
+		log.Debug("Value of KeyPass from config file:", value)
+		o := Parser.FindOptionByLongName("KeyPass")
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", Archit.KeyPass)
+			Archit.KeyPass = value
 		}
+	} else {
+		log.Debug("KeyPass value NOT specified by config file")
+		o := Parser.FindOptionByLongName("KeyPass")
+		if o.IsSetDefault() {
+			log.Critical("KeyPass value must be set!")
+		}
+	}
+	if needKey {
 		value, err = conf.GetValue("", "KeyPIN")
 		if err == nil {
 			log.Debug("KeyPIN value specified by config file")
@@ -169,6 +170,14 @@ func Conf(needKey bool) {
 			log.Debug("Configuration value of", value, "overriding default value", Archit.WalletAddr)
 			Archit.WalletAddr = value
 		}
+	} else {
+		o := Parser.FindOptionByLongName("WalletAddr")
+		if o.IsSetDefault() {
+			log.Console("Hey!  Don't use the default WalletAddr!!!")
+			log.Console("Suggest adding 'WalletAddr =' in",Archit.Conf)
+			log.Console("Issue an 'archit --help' and read the output for more hints")
+			log.Critical("WalletAddr error")
+		}
 	}
 	value, err = conf.GetValue("", "WalletIP")
 	if err == nil {
@@ -199,6 +208,14 @@ func Conf(needKey bool) {
 			log.Debug("Configuration value of", value, "overriding default value", Archit.WalletUser)
 			Archit.WalletUser = value
 		}
+	} else {
+		o := Parser.FindOptionByLongName("WalletUser")
+		if o.IsSetDefault() {
+			log.Console("Hey!  Don't use the default WalletUser!!!")
+			log.Console("Suggest adding 'WalletUser =' in",Archit.Conf)
+			log.Console("Issue an 'archit --help' and read the output for more hints")
+			log.Critical("WalletUser error")
+		}
 	}
 	value, err = conf.GetValue("", "WalletPassword")
 	if err == nil {
@@ -207,6 +224,14 @@ func Conf(needKey bool) {
 		if o.IsSetDefault() {
 			log.Debug("Configuration value of WalletPassword overriding default value")
 			Archit.WalletPassword = value
+		}
+	} else {
+		o := Parser.FindOptionByLongName("WalletPassword")
+		if o.IsSetDefault() {
+			log.Console("Hey!  Don't use the default WalletPassword!!!")
+			log.Console("Suggest adding 'WalletPassword =' in",Archit.Conf)
+			log.Console("Issue an 'archit --help' and read the output for more hints")
+			log.Critical("WalletPassword error")
 		}
 	}
 	value, err = conf.GetValue("", "DBDir")
@@ -224,15 +249,6 @@ func Conf(needKey bool) {
 		dir := usr.HomeDir + "/"
 		Archit.DBDir = strings.Replace(Archit.DBDir, "~/", dir, 1)
 		log.Debug("DBDir expanded to", Archit.DBDir)
-	}
-	value, err = conf.GetValue("", "Chaos")
-	if err == nil {
-		log.Debug("Chaos found in configuration file")
-		o := Parser.FindOptionByLongName("Chaos")
-		if o.IsSetDefault() {
-			log.Debug("Chaos set to True via configuration file")
-			Archit.Chaos = true
-		}
 	}
 	// Go out and determine our public IP address
 	util.ServerIP = net.JoinHostPort(util.GetExtIP(), strconv.Itoa(Archit.PortBase))

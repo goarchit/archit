@@ -7,6 +7,8 @@ package cmd
 import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
+	"io/ioutil"
 )
 
 type ConfigCommand struct {
@@ -14,11 +16,24 @@ type ConfigCommand struct {
 
 func init() {
 	configCmd := ConfigCommand{}
-	config.Parser.AddCommand("config", "Displays your current configuration file[Free]", "", &configCmd)
+	config.Parser.AddCommand("config", "Displays your current configuration file", "", &configCmd)
 }
 
 func (ec *ConfigCommand) Execute(args []string) error {
 	config.Conf(false)
-	log.Console("Config command not implemented")
+
+	util.Challenge()
+
+	log.Console(config.Archit.Conf+":\n")
+	f, err := ioutil.ReadFile(config.Archit.Conf)
+	if err != nil {
+		log.Console("Unable to open specified configuration file.")
+		return err
+	} 
+	if err != nil {
+		log.Console("Error reading file:",err)
+		return err
+	}
+	log.Console(string(f))
 	return nil
 }

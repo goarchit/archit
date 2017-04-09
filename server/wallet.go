@@ -72,7 +72,7 @@ func Wallet(c chan string) {
 	}
 	_, err = client.ValidateAddress(addr)
 	if err != nil {
-		log.Critical("Wallet address validation error:", err)
+		log.Critical("Wallet address validation error:", err,"\n Is the wallet running?")
 	} else {
 		log.Debug("Wallet address passes validation test")
 	}

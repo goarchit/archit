@@ -14,7 +14,7 @@ type CreateCommand struct {
 
 func init() {
 	createCmd := CreateCommand{}
-	config.Parser.AddCommand("create", "Interactively create/edit your configuration file[Free]", "", &createCmd)
+	config.Parser.AddCommand("create", "Interactively create/edit your configuration file", "", &createCmd)
 }
 
 func (ec *CreateCommand) Execute(args []string) error {

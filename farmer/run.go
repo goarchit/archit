@@ -29,7 +29,7 @@ func Run(c chan bool) {
 	gorpc.RegisterType(&Peer{})
 	extRPC.AddFunc("Ping", func() string { return "ePong!" })
 	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
-	extRPC.AddFunc("PeerRequest", func(p *Peer) error { return PeerRequest(p) })
+	extRPC.AddFunc("PeerListAll", func() *PeerList { return PeerListAll() })
 
 	// Then launch the server
 	serverIP := ":" + strconv.Itoa(config.Archit.PortBase) // Listen on all interfaces

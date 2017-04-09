@@ -84,10 +84,6 @@ func PeerAdd(pi *PeerInfo) error {
 	return nil
 }
 
-func PeerRequest(p *Peer) error {
-	return nil
-}
-
 func PeerDelete(p *Peer) error {
 	return nil
 }

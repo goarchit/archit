@@ -74,7 +74,7 @@ func Open() {
 			log.Critical("Error decoding PeerMap:", err)
 		}
 		log.Debug("PeerMap successfully assigned")
-		log.Console("Peermap loaded:", farmer.PeerMap.PL)
+		log.Trace("PeerMap loaded:",farmer.PeerMap.PL)
 	}
 
 	// Do other initialization work
