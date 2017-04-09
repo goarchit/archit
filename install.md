@@ -20,10 +20,14 @@
       go get github.com/valyala/gorpc
       go get golang.org/x/crypto/scrypt
 
-      Each of the above will only take a few seconds to run
+      Each of the above will only take a few seconds to run.  Hint:  cut & paste them as a batch.
 
       A "go install archit" should now compile clean.
 
+      Note: for a clean "archit status" response:
+            edit github.com/btcsuite/btcutil/amount.go 
+            and change lines 36->44 from "BTC" to "IMAC"
+ 
 6) You will need an IMACredit wallet running:
    In the directory of your choice:  git clone https://github.com/imacredit/imacredit
    cd imacredit/src
@@ -35,6 +39,9 @@
    ./imacreditd&
    and just let it run - it should sync with the IMAC network within a few hours, or perhaps
    overnight, depending on network speeds
+   After a few minutes, you should be able to issue a command like:
+   ./imacreditd getaccountaddress goarchit - which will create a valid IMAC wallet address and 
+   lable it "goarchit".  Of course, you can pick your own label.
 7) Alternatively download the Windows wallet from http://www.imacredit.org - there is no need
    for the wallet to be running on the same machine as GoArchit
 8) Although you can run archit without a configuration file, it gets tedious to do so...
@@ -44,7 +51,7 @@
               This should look something like 9KsqKMgLjzBWKidhes356Kjhdwbd9BT4Te
         WalletUser = <the RPC user defined in imacredit.conf>
         WalletPassword = <the RPC password defined in imacredit.conf>
-        RPCuser = architrpc
+        RPCuser = architrpc  <or anything else you like>
         RPCPassword = SomeRandomPasswordWithoutSpaces902q34890u328490
         
 9)  Do an "archit --help" to see options
@@ -55,10 +62,14 @@ Come /join us on freenode channels #imacredit and/or #goarchit
 
 To upgrade to the latest push:
 
-cd ~/src/github.com/goarchit
+cd ~/src/github.com/goarchit/archit
 git pull https://github.com/goarchit/archit
 cd archit
 go install
 
 (and restart your farmer)
 
+Special note for GRSEC users (typically hardened kernels):
+   Go programs will generate "denied RWX mprotect of" type messages
+   Issue a "paxctl-ng -m /home/goarchit/bin/archit" to fix it (using your binaries location)
+   You may need to do this each time you regenerate archit

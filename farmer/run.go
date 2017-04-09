@@ -27,12 +27,12 @@ func Run(c chan bool) {
 	// External RPC service first
 	// Start by registering fucntions and types
 	gorpc.RegisterType(&Peer{})
-	extRPC.AddFunc("Ping", func() string { return "Pong!" })
+	extRPC.AddFunc("Ping", func() string { return "ePong!" })
 	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
 	extRPC.AddFunc("PeerRequest", func(p *Peer) error { return PeerRequest(p) })
 
 	// Then launch the server
-	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(config.Archit.PortBase))
+	serverIP := ":" + strconv.Itoa(config.Archit.PortBase) // Listen on all interfaces
 	log.Info("Farmer External RPC Server using server address", serverIP)
 	extCmd = gorpc.NewTCPServer(serverIP, extRPC.NewHandlerFunc())
 	extCmd.OnConnect = newOnConnectFunc()
@@ -45,7 +45,7 @@ func Run(c chan bool) {
 
 	// Internal RCP service next
 	// Start by registering functions and types
-	intRPC.AddFunc("Ping", func() string { return "Pong!" })
+	intRPC.AddFunc("Ping", func() string { return "iPong!" })
 	intRPC.AddFunc("Status", func() string { return Status() })
 	// intRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(wa,p)})
 	intRPC.AddFunc("PeerDelete", func(p *Peer) error { return PeerDelete(p) })

@@ -12,20 +12,20 @@ import (
 	"strconv"
 )
 
-type PingCommand struct {
+type EPingCommand struct {
 }
 
 func init() {
-	pingCmd := PingCommand{}
-	config.Parser.AddCommand("ping", "Pings the farming service[Free]", "", &pingCmd)
+	pingCmd := EPingCommand{}
+	config.Parser.AddCommand("eping", "Pings the external farming service[Free]", "", &pingCmd)
 }
 
-func (ec *PingCommand) Execute(args []string) error {
+func (ec *EPingCommand) Execute(args []string) error {
 	config.Conf(false)
 
 	/// Insert RPC code to query the farmer
 
-	port := config.Archit.PortBase
+	port := config.Archit.PortBase 
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	c := gorpc.NewTCPClient(serverIP)
 	c.Start()
