@@ -10,7 +10,7 @@ var RemoteAddr string
 
 func newOnConnectFunc() gorpc.OnConnectFunc {
 	return func(remoteAddr string, rwc io.ReadWriteCloser) (io.ReadWriteCloser, error) {
-		log.Trace("Connection from", remoteAddr)
+		log.Console("Connection from", remoteAddr)
 		RemoteAddr = remoteAddr
 		return rwc, nil
 	}
