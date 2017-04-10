@@ -41,6 +41,14 @@ func init() {
 }
 
 func PeerAdd(pi *PeerInfo) error {
+	//  Copy who we are being connected from.
+	remoteAddr := RemoteAddr
+
+	remoteHost, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		log.Critical("Connect from invalid host?!?!",err)
+	}
+
 	if len(pi.WalletAddr) != 34 {
 		return errors.New("PeerAdd:  Invalid Wallet Address passed " + pi.WalletAddr +
 			" (len)=" + strconv.Itoa(len(pi.WalletAddr)))
@@ -88,10 +96,13 @@ func PeerAdd(pi *PeerInfo) error {
 	PeerMap.PL[pi.WalletAddr] = pm
 
 	// If your a seed, do your duty and tell everyone
-	pIP := util.PublicIP+SeedPortBase
 	if util.IAmASeed {
 		for _, v := range PeerMap.PL {
-			if v.IPAddr != pIP {
+			tellIP, _, err := net.SplitHostPort(v.IPAddr)
+			if err != nil {
+				log.Critical("Bad news, invalid entry in PeerMap.PL:",err)
+			}
+			if tellIP != util.PublicIP && tellIP != remoteHost {
 				go tellNode(pi)
 			}
 		}

@@ -44,10 +44,6 @@ Come /join us on freenode channels #imacredit and/or #goarchit
 
 To upgrade to the latest push:
 
-go get -u github.com/goarchit/archit 
-
-if "go get" fails with a git error, do the git by hand:
-
 cd src/github.com/goarchit/archit
 git pull
 go install  (and resolve any missing packages with go get <package>)
