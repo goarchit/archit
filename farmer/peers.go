@@ -42,10 +42,8 @@ func init() {
 func PeerAdd(pi *PeerInfo) error {
 	PeerMap.mutex.Lock()
 	defer PeerMap.mutex.Unlock()
-	//  Copy who we are being connected from.
-	remoteAddr := RemoteAddr
 
-	remoteHost, _, err := net.SplitHostPort(remoteAddr)
+	remoteHost, _, err := net.SplitHostPort(RemoteAddr)
 	if err != nil {
 		log.Critical("Connect from invalid host?!?!",err)
 	}
@@ -55,7 +53,7 @@ func PeerAdd(pi *PeerInfo) error {
 	}
 	val, found := PeerMap.PL[pi.WalletAddr]
 	if found {
-		log.Console("Peer", pi.WalletAddr, "entering network")
+		log.Console("Peer", pi.WalletAddr, "entering network from",RemoteAddr)
 		if val.IPAddr != pi.Detail.IPAddr {
 			log.Warning("Peer", pi.WalletAddr, "IP has changed!  Old=", val.IPAddr,
 				"New=", pi.Detail.IPAddr)
@@ -100,6 +98,8 @@ func PeerAdd(pi *PeerInfo) error {
 			if err != nil {
 				log.Critical("Bad news, invalid entry in PeerMap.PL:",err)
 			}
+			log.Console("About to Tell",tellIP,"we are",util.PublicIP,"told from",
+				remoteHost,"about",pi.WalletAddr)
 			if tellIP != util.PublicIP && tellIP != remoteHost {
 				go tellNode(pi)
 			}
