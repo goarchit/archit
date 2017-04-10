@@ -69,8 +69,6 @@ func PeerAdd(pi *PeerInfo) error {
 	} else {
 		log.Console("Peer", pi.WalletAddr," is new to the network")
 		// Only allow the public key to be stored the first time
-		PeerMap.mutex.Lock()
-		defer PeerMap.mutex.Unlock()
 		pm := PeerMap.PL[pi.WalletAddr]
 		pm.PublicKey = pi.Detail.PublicKey
 		pm.Reputation = 0
