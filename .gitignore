@@ -28,3 +28,6 @@ _testmain.go
 
 # Various log files
 *.log
+
+# And editor swap files
+*.swp

@@ -39,6 +39,7 @@ func announce() {
 		if util.IAmASeed {
 			if v == util.PublicIP {
 				tell = false
+				RemoteAddr = util.ServerIP
 				PeerAdd(iAm)
 			}
 		}
