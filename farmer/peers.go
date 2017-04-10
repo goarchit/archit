@@ -7,7 +7,6 @@ import (
 	"encoding/gob"
 	"errors"
 	"net"
-	"strconv"
 	"sync"
 )
 
@@ -41,6 +40,8 @@ func init() {
 }
 
 func PeerAdd(pi *PeerInfo) error {
+	PeerMap.mutex.Lock()
+	defer PeerMap.mutex.Unlock()
 	//  Copy who we are being connected from.
 	remoteAddr := RemoteAddr
 
@@ -50,8 +51,7 @@ func PeerAdd(pi *PeerInfo) error {
 	}
 
 	if len(pi.WalletAddr) != 34 {
-		return errors.New("PeerAdd:  Invalid Wallet Address passed " + pi.WalletAddr +
-			" (len)=" + strconv.Itoa(len(pi.WalletAddr)))
+		log.Critical("Invalid WalletAddr:",pi.WalletAddr)
 	}
 	val, found := PeerMap.PL[pi.WalletAddr]
 	if found {
@@ -125,17 +125,17 @@ func PeerListAll() string {
 }
 
 func peerListAdd(pl PeerList) {
+	PeerMap.mutex.Lock()
+	defer PeerMap.mutex.Unlock()
 	for k, v := range pl {
-		log.Console("Bulk request to add", k, v)
+		log.Trace("Bulk request to add", k, v)
 		_, found := PeerMap.PL[k]
 		if found {
-			log.Console(k, "already in map")
+			log.Console("Add request for",k,": already in map")
 		} else {
-			log.Console(k, "is new!")
+			log.Console("Add request for",k,": is new!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
-			PeerMap.mutex.Lock()
-			defer PeerMap.mutex.Unlock()
 			PeerMap.PL[k] = v
 		}
 	}
