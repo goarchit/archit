@@ -18,7 +18,7 @@ func Challenge() {
 	rand.Seed(time.Now().UnixNano())
 	num := rand.Intn(899999)+100000
 
-	fmt.Println("*** WARNING!  You are about to display very sensitive data.***")
+	fmt.Println("*** WARNING!  You are about to display very sensitive data! ***")
 	fmt.Print("If you wish to proceed enter the number ",num,": ")
 	_, err := fmt.Scanf("%d", &enum)
 	if err != nil {

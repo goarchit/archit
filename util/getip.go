@@ -38,5 +38,6 @@ func GetExtIP() string {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
 	s := buf.String()
-	return s[0 : len(s)-1]
+	PublicIP = s[0 : len(s)-1]
+	return PublicIP
 }

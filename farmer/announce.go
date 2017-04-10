@@ -19,11 +19,7 @@ var FarmerMutex sync.Mutex
 
 func announce() {
 
-	addresses, err := net.LookupHost("dnsseed.goarchit.online")
-	if err != nil {
-		log.Critical("Failure to lookup dnsseed.goarchit.online")
-	}
-	log.Debug("DNSseed resolved to", addresses)
+	util.Dnsseed()
 
 	iAm := new(PeerInfo)
 	iAm.WalletAddr = config.Archit.WalletAddr
@@ -37,14 +33,21 @@ func announce() {
 	log.Debug("whoAmI:", string(s))
 
 	// Find an active seed node
-	for i := 0; i < len(addresses); i++ {
-		seed := addresses[i]
-		log.Trace("Found seed ", seed)
-		go tellSeed(iAm,seed+SeedPortBase)
+	for _, v := range util.DNSSeeds {
+		log.Trace("Found seed ", v)
+		tell := true
+		if util.IAmASeed {
+			if v == util.PublicIP {
+				tell = false
+				PeerAdd(iAm)
+			}
+		}
+		if tell {
+			go tellSeed(iAm,v+SeedPortBase)
+		}
 	}
 	log.Trace("Farmer node startup complete!")
 }
-
 func tellSeed(pi *PeerInfo,serverIP string) {
 
 	var newPL PeerList
@@ -79,4 +82,20 @@ func tellSeed(pi *PeerInfo,serverIP string) {
 			peerListAdd(newPL)
 		}
 	}
+}
+
+func tellNode(pi *PeerInfo) {
+
+	serverIP := pi.Detail.IPAddr
+	c := gorpc.NewTCPClient(serverIP)
+	c.Start()
+	defer c.Stop()
+
+	d := gorpc.NewDispatcher()
+	d.AddFunc("PeerAdd", func(pi *PeerInfo) {})
+	dc := d.NewFuncClient(c)
+	_, err := dc.Call("PeerAdd", pi)
+	if err != nil {
+		log.Warning("Accounce to node", serverIP, "failed:", err)
+	} 
 }

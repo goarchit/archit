@@ -21,7 +21,5 @@ func genGoodConfig() {
         }
 	defer f.Close()
  	f.Write([]byte("KeyPass = "+pwordgen.NewPassword(80)+"\n"))
-	f.Write([]byte("RPCuser = architrpc\n"))
-	f.Write([]byte("RPCPassword = "+pwordgen.NewPassword(48)+"\n"))
 	log.Console("It is recommended you add WalletAddr, WalletUser & WalletPassword or specify them via the command line or environment variables!")
 }

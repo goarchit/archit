@@ -35,8 +35,6 @@
               This should look something like 9KsqKMgLjzBWKidhes356Kjhdwbd9BT4Te
         WalletUser = <the RPC user defined in imacredit.conf>
         WalletPassword = <the RPC password defined in imacredit.conf>
-        RPCuser = architrpc  <or anything else you like>
-        RPCPassword = SomeRandomPasswordWithoutSpaces902q34890u328490
         
 8)  Do an "archit --help" to see options
 9)  Do an "archit farm" to start farming
@@ -46,13 +44,15 @@ Come /join us on freenode channels #imacredit and/or #goarchit
 
 To upgrade to the latest push:
 
-cd ~/src/github.com/goarchit/archit
-git pull 
-or just reissue the "go get github.com/goarchit/archit" command
+go get -u github.com/goarchit/archit 
 
-go install
+if "go get" fails with a git error, do the git by hand:
 
-(and restart your farmer)
+cd src/github.com/goarchit/archit
+git pull
+go install  (and resolve any missing packages with go get <package>)
+
+Then restart your farmer
 
 Special note for GRSEC users (typically hardened kernels):
    Go programs will generate "denied RWX mprotect of" type messages

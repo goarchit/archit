@@ -17,6 +17,9 @@ var Raptor int
 var DerivedKey []byte
 var ServerIP string
 var FarmerStop chan bool
+var PublicIP string
+var DNSSeeds []string
+var IAmASeed bool
 
 func init() {
 	FarmerStop = make(chan bool)

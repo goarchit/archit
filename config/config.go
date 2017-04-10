@@ -104,13 +104,10 @@ func Conf(needKey bool) {
 	value, err = conf.GetValue("", "LogFile")
 	if err == nil {
 		log.Debug("Value of LogLevel from config file:", value)
-		o := Parser.FindOptionByLongName("LogLevel")
+		o := Parser.FindOptionByLongName("LogFile")
 		if o.IsSetDefault() {
 			log.Debug("Configuration value of", value, "overriding default value", Archit.LogLevel)
-			Archit.LogLevel, err = strconv.Atoi(value)
-			if err != nil {
-				log.Critical(err)
-			}
+			Archit.LogFile = value
 		}
 	}
 	value, err = conf.GetValue("", "KeyPass")

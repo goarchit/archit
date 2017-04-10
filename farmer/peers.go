@@ -2,6 +2,7 @@ package farmer
 
 import (
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"bytes"
 	"encoding/gob"
 	"errors"
@@ -21,6 +22,7 @@ type PeerInfo struct {
 	WalletAddr string
 	Detail     Peer
 }
+
 type PeerList map[string]Peer // Indexed by Wallet Address
 
 var PeerMap struct {
@@ -57,6 +59,7 @@ func PeerAdd(pi *PeerInfo) error {
 			log.Warning("Accepting change for now, need code to authenticate")
 		}
 	} else {
+		log.Console("Peer", pi.WalletAddr," is new to the network")
 		// Only allow the public key to be stored the first time
 		PeerMap.mutex.Lock()
 		defer PeerMap.mutex.Unlock()
@@ -83,6 +86,16 @@ func PeerAdd(pi *PeerInfo) error {
 	pm.IPAddr = pi.Detail.IPAddr
 	pm.MacAddr = pi.Detail.MacAddr
 	PeerMap.PL[pi.WalletAddr] = pm
+
+	// If your a seed, do your duty and tell everyone
+	pIP := util.PublicIP+SeedPortBase
+	if util.IAmASeed {
+		for _, v := range PeerMap.PL {
+			if v.IPAddr != pIP {
+				go tellNode(pi)
+			}
+		}
+	}
 	return nil
 }
 
