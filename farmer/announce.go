@@ -94,6 +94,8 @@ func tellNode(pi *PeerInfo) {
 	d := gorpc.NewDispatcher()
 	d.AddFunc("PeerAdd", func(pi *PeerInfo) {})
 	dc := d.NewFuncClient(c)
+	Connect.Lock()
+	RemoteAddr = util.ServerIP
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
 		log.Warning("Accounce to node", serverIP, "failed:", err)

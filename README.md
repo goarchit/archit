@@ -47,6 +47,6 @@ intended until after Alpha testing, if then.
 7)  This project will be invitation only/private until Beta release, when limited public support 
 will be offered.
 
-8)  This code is dependant upon one modification to the standard 
-github.com/btcsuite/btcutil/amount.go file:  
+8)  This code looks nicer if you make one modification to the standard 
+    github.com/btcsuite/btcutil/amount.go file:  
     Lines 36->44 should be changed from "BTC" to "IMAC"
