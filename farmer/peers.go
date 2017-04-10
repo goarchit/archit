@@ -98,9 +98,9 @@ func PeerAdd(pi *PeerInfo) error {
 			if err != nil {
 				log.Critical("Bad news, invalid entry in PeerMap.PL:",err)
 			}
-			log.Console("About to Tell",tellIP,"we are",util.PublicIP,"told from",
-				remoteHost,"about",pi.WalletAddr)
 			if tellIP != util.PublicIP && tellIP != remoteHost {
+				log.Console("About to Tell",tellIP,".  We are",util.PublicIP,
+					"told from", remoteHost,"about",pi.WalletAddr)
 				go tellNode(pi)
 			}
 		}
