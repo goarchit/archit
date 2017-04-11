@@ -46,7 +46,7 @@ func dnsalive(i int, v string) {
 		found = true
 		log.Console("DNSSeed",v,"is alive.")
 	}
-	if !found {
+	if !found && !IAmASeed {
 		log.Critical("No DNSSeeds are apparently active.  Sorry.")
 	}
 }
