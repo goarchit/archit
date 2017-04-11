@@ -24,6 +24,7 @@ func announce() {
 	iAm := new(PeerInfo)
 	iAm.SenderIP = util.PublicIP
 	iAm.WalletAddr = config.Archit.WalletAddr
+	iAm.HopCount = 2	// Once to my seed, once from there
 	iAm.Detail.IPAddr = util.PublicIP
 	iAm.Detail.MacAddr = "Invalid"
 	rifs := util.RoutedInterface("ip", net.FlagUp|net.FlagBroadcast)
@@ -81,6 +82,6 @@ func tellNode(pi *PeerInfo) {
 	dc := d.NewFuncClient(c)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
-		log.Warning("Accounce to node", serverIP, "failed:", err)
+		log.Warning("Announce to node", serverIP, "failed:", err)
 	} 
 }

@@ -20,6 +20,7 @@ type Peer struct {
 type PeerInfo struct {
 	SenderIP   string // including port
 	WalletAddr string
+	HopCount   int
 	Detail     Peer
 }
 
@@ -43,6 +44,12 @@ func init() {
 func PeerAdd(pi *PeerInfo) error {
 	PeerMap.mutex.Lock()		// Needed?
 	defer PeerMap.mutex.Unlock()
+
+	// Decrement the hop count to prevent if not zero to prevent PeerAdd storms
+	if pi.HopCount == 0 {
+		return errors.New("Out of hops")
+	}
+	pi.HopCount--
 
 	// Do quick sanity checks
 
@@ -109,8 +116,8 @@ func PeerAdd(pi *PeerInfo) error {
 			}
 			// Don't tell myself or the person that told me
 			if v.IPAddr != util.PublicIP && v.IPAddr != pi.SenderIP{
-				log.Console("We(",util.PublicIP,") are about to tellNode(",
-					v.IPAddr,") that we learned about",pi.Detail.IPAddr,
+				log.Console("We",util.PublicIP,"are about to tellNode",
+					v.IPAddr,"that we learned about",pi.Detail.IPAddr,
 					"from",pi.SenderIP)
 				go tellNode(pi)
 			}
@@ -140,9 +147,9 @@ func peerListAdd(pl PeerList) {
 		log.Trace("Bulk request to add", k, v)
 		_, found := PeerMap.PL[k]
 		if found {
-			log.Console("Add request for",k,": already in map")
+			log.Console("Add request for",k,":already in map")
 		} else {
-			log.Console("Add request for",k,": is new!")
+			log.Console("Add request for",k,":is new!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
 			PeerMap.PL[k] = v
