@@ -31,3 +31,5 @@ _testmain.go
 
 # And editor swap files
 *.swp
+# And project backup files
+*.old

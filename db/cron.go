@@ -25,7 +25,7 @@ func CronDaily() {
 	for {
 		t := time.NewTimer(24 * time.Hour)
 		<-t.C
-		oldHost, _, err := net.SplitHostPort(util.ServerIP)
+		oldHost, _, err := net.SplitHostPort(util.PublicIP)
 		if err != nil {
 			log.Critical("Checkip:  Error spliting host & port -", err)
 		}

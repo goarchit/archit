@@ -1,3 +1,5 @@
+//  Announce announces to the network that this node has joined
+//  It does so by telling the first seed node it finds active
 package farmer
 
 import (
@@ -12,18 +14,17 @@ import (
 	"sync"
 )
 
-const SeedPortBase string = ":1958"
-
-var FoundSeed bool
 var FarmerMutex sync.Mutex
 
 func announce() {
+	var newPL PeerList
 
 	util.Dnsseed()
 
 	iAm := new(PeerInfo)
+	iAm.SenderIP = util.PublicIP
 	iAm.WalletAddr = config.Archit.WalletAddr
-	iAm.Detail.IPAddr = util.ServerIP
+	iAm.Detail.IPAddr = util.PublicIP
 	iAm.Detail.MacAddr = "Invalid"
 	rifs := util.RoutedInterface("ip", net.FlagUp|net.FlagBroadcast)
 	if rifs != nil {
@@ -32,28 +33,9 @@ func announce() {
 	s, _ := json.Marshal(iAm)
 	log.Debug("whoAmI:", string(s))
 
-	// Find an active seed node
-	for _, v := range util.DNSSeeds {
-		log.Trace("Found seed ", v)
-		tell := true
-		if util.IAmASeed {
-			if v == util.PublicIP {
-				tell = false
-				RemoteAddr = util.ServerIP
-				PeerAdd(iAm)
-			}
-		}
-		if tell {
-			go tellSeed(iAm,v+SeedPortBase)
-		}
-	}
-	log.Trace("Farmer node startup complete!")
-}
-func tellSeed(pi *PeerInfo,serverIP string) {
+	// Active seed node already found in util.DNSsed() and stored in util.MyDNSServerIP
 
-	var newPL PeerList
-
-	c := gorpc.NewTCPClient(serverIP)
+	c := gorpc.NewTCPClient(util.MyDNSServerIP)
 	c.Start()
 	defer c.Stop()
 
@@ -61,28 +43,28 @@ func tellSeed(pi *PeerInfo,serverIP string) {
 	d.AddFunc("PeerAdd", func(pi *PeerInfo) {})
 	d.AddFunc("PeerListAll", func() {})
 	dc := d.NewFuncClient(c)
-	_, err := dc.Call("PeerAdd", pi)
+	// Add yourself to your seed node, the seed will tell everyone else
+	_, err := dc.Call("PeerAdd", iAm)
 	if err != nil {
-		log.Warning("Accounce to seed", serverIP, "failed:", err)
-	} else {
-		FoundSeed = true
-		s, err := dc.Call("PeerListAll",nil)
-		if err != nil {
-			log.Warning("Attempt to get PeerList from seed", serverIP, "failed:", err)
-		} else {
-			str, ok := s.(string)
-			if !ok {
-				log.Critical("Tellseed: dc.call(PeerListAll) did not return a string")
-			}
-			buf := bytes.NewBufferString(str)
-			dec := gob.NewDecoder(buf)
-			err = dec.Decode(&newPL)
-			if err != nil {
-				log.Critical("Tellseed:  Error decoding PeerMap:",err)
-			}	
-			peerListAdd(newPL)
-		}
+		log.Critical("Accounce to seed", util.MyDNSServerIP, "failed:", err)
 	}
+	// Now go ask for all known nodes
+	plstr, err := dc.Call("PeerListAll",nil)
+	if err != nil {
+		log.Critical("Attempt to get PeerList from seed", util.MyDNSServerIP, "failed:", err)
+	} 
+	str, ok := plstr.(string)
+	if !ok {
+		log.Critical("Tellseed: dc.call(PeerListAll) did not return a string")
+	}
+	buf := bytes.NewBufferString(str)
+	dec := gob.NewDecoder(buf)
+	err = dec.Decode(&newPL)
+	if err != nil {
+		log.Critical("Tellseed:  Error decoding PeerMap:",err)
+	}
+	peerListAdd(newPL)
+	log.Trace("Farmer node startup complete!")
 }
 
 func tellNode(pi *PeerInfo) {
@@ -93,9 +75,10 @@ func tellNode(pi *PeerInfo) {
 	defer c.Stop()
 
 	d := gorpc.NewDispatcher()
+	// Override SerderIP
+	pi.SenderIP = util.PublicIP
 	d.AddFunc("PeerAdd", func(pi *PeerInfo) {})
 	dc := d.NewFuncClient(c)
-	RemoteAddr = util.ServerIP
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
 		log.Warning("Accounce to node", serverIP, "failed:", err)

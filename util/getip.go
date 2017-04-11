@@ -12,7 +12,7 @@ import (
 )
 
 func GetExtIP() string {
-	// Go fetch our External IP address
+	// Go fetch our External IP address, WITHOUT PORT
 	resp, err := http.Get("http://myexternalip.com/raw")
 	if err != nil {
 		log.Console("Problem getting PublicIP Address, retrying in 1 second")
@@ -38,6 +38,5 @@ func GetExtIP() string {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
 	s := buf.String()
-	PublicIP = s[0 : len(s)-1]
-	return PublicIP
+	return s[0 : len(s)-1]
 }

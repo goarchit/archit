@@ -248,7 +248,7 @@ func Conf(needKey bool) {
 		log.Debug("DBDir expanded to", Archit.DBDir)
 	}
 	// Go out and determine our public IP address
-	util.ServerIP = net.JoinHostPort(util.GetExtIP(), strconv.Itoa(Archit.PortBase))
+	util.PublicIP = net.JoinHostPort(util.GetExtIP(),strconv.Itoa(Archit.PortBase))
 	// Build the encryption Matrix
 	util.BuildMatrix()
 	// Make sure we have valud certification files

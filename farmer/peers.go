@@ -18,6 +18,7 @@ type Peer struct {
 }
 
 type PeerInfo struct {
+	SenderIP   string // including port
 	WalletAddr string
 	Detail     Peer
 }
@@ -40,37 +41,16 @@ func init() {
 }
 
 func PeerAdd(pi *PeerInfo) error {
-	PeerMap.mutex.Lock()
+	PeerMap.mutex.Lock()		// Needed?
 	defer PeerMap.mutex.Unlock()
 
-	remoteHost, _, err := net.SplitHostPort(RemoteAddr)
-	if err != nil {
-		log.Critical("Connect from invalid host?!?!",err)
-	}
+	// Do quick sanity checks
 
 	if len(pi.WalletAddr) != 34 {
 		log.Critical("Invalid WalletAddr:",pi.WalletAddr)
 	}
-	val, found := PeerMap.PL[pi.WalletAddr]
-	if found {
-		log.Console("Peer", pi.WalletAddr, "entering network from",RemoteAddr)
-		if val.IPAddr != pi.Detail.IPAddr {
-			log.Warning("Peer", pi.WalletAddr, "IP has changed!  Old=", val.IPAddr,
-				"New=", pi.Detail.IPAddr)
-			log.Warning("Accepting change for now, need code to authenticate")
-		}
-		if val.MacAddr != pi.Detail.MacAddr {
-			log.Warning("Peer", pi.WalletAddr, "MAC has changed!  Old=", val.MacAddr,
-				"New=", pi.Detail.MacAddr)
-			log.Warning("Accepting change for now, need code to authenticate")
-		}
-	} else {
-		log.Console("Peer", pi.WalletAddr," is new to the network")
-		// Only allow the public key to be stored the first time
-		pm := PeerMap.PL[pi.WalletAddr]
-		pm.PublicKey = pi.Detail.PublicKey
-		pm.Reputation = 0
-		PeerMap.PL[pi.WalletAddr] = pm
+	if pi.WalletAddr[0] != '9' {
+		log.Critical("Not an IMAC WalletAddr:",pi.WalletAddr)
 	}
 	host, _, err := net.SplitHostPort(pi.Detail.IPAddr)
 	if err != nil {
@@ -86,21 +66,52 @@ func PeerAdd(pi *PeerInfo) error {
 		return errors.New("Too many Farmers using MAC Address " + pi.Detail.MacAddr)
 	}
 
-	pm := PeerMap.PL[pi.WalletAddr]
-	pm.IPAddr = pi.Detail.IPAddr
-	pm.MacAddr = pi.Detail.MacAddr
-	PeerMap.PL[pi.WalletAddr] = pm
+	// Onward to the real processing
+
+	val, found := PeerMap.PL[pi.WalletAddr]
+	if found {
+		log.Console("Peer", pi.WalletAddr, "entering network from",pi.SenderIP)
+		pm := PeerMap.PL[pi.WalletAddr]
+		change := false
+		if val.IPAddr != pi.Detail.IPAddr {
+			log.Warning("Peer", pi.WalletAddr, "IP has changed!  Old=", val.IPAddr,
+				"New=", pi.Detail.IPAddr)
+			log.Warning("Accepting change for now, need code to authenticate")
+			pm.IPAddr = pi.Detail.IPAddr
+			change = true
+		}
+		if val.MacAddr != pi.Detail.MacAddr {
+			log.Warning("Peer", pi.WalletAddr, "MAC has changed!  Old=", val.MacAddr,
+				"New=", pi.Detail.MacAddr)
+			log.Warning("Accepting change for now, need code to authenticate")
+			pm.MacAddr = pi.Detail.MacAddr
+			change = true
+		}
+		if change {
+			PeerMap.PL[pi.WalletAddr] = pm
+		}
+	} else {
+		log.Console("Peer", pi.WalletAddr," is new to the PeerList")
+		// Only allow the public key to be stored the first time
+		pm := PeerMap.PL[pi.WalletAddr]
+		pm.PublicKey = pi.Detail.PublicKey
+		pm.IPAddr = pi.Detail.IPAddr
+		pm.MacAddr = pi.Detail.MacAddr
+		pm.Reputation = 0
+		PeerMap.PL[pi.WalletAddr] = pm
+	}
 
 	// If your a seed, do your duty and tell everyone
 	if util.IAmASeed {
 		for _, v := range PeerMap.PL {
-			tellIP, _, err := net.SplitHostPort(v.IPAddr)
 			if err != nil {
 				log.Critical("Bad news, invalid entry in PeerMap.PL:",err)
 			}
-			if tellIP != util.PublicIP && tellIP != remoteHost {
-				log.Console("About to Tell",tellIP,".  We are",util.PublicIP,
-					"told from", remoteHost,"about",pi.WalletAddr)
+			// Don't tell myself or the person that told me
+			if v.IPAddr != util.PublicIP && v.IPAddr != pi.SenderIP{
+				log.Console("We(",util.PublicIP,") are about to tellNode(",
+					v.IPAddr,") that we learned about",pi.Detail.IPAddr,
+					"from",pi.SenderIP)
 				go tellNode(pi)
 			}
 		}
