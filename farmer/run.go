@@ -32,7 +32,7 @@ func Run(c chan bool) {
 
 	// Then launch the server
 	serverIP := ":" + strconv.Itoa(config.Archit.PortBase) // Listen on all interfaces
-	log.Info("Farmer External RPC Server using server address", serverIP)
+	log.Console("Farmer External RPC Server using server address", serverIP)
 	extCmd = gorpc.NewTCPServer(serverIP, extRPC.NewHandlerFunc())
 	err := extCmd.Start()
 	if err != nil {
@@ -52,7 +52,7 @@ func Run(c chan bool) {
 	// Then launch the server
 	port := config.Archit.PortBase + 1
 	serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
-	log.Info("Farmer Internal RPC Server using server address", serverIP)
+	log.Console("Farmer Internal RPC Server using server address", serverIP)
 	intCmd = gorpc.NewTCPServer(serverIP, intRPC.NewHandlerFunc())
 	err = intCmd.Start()
 	if err != nil {
@@ -61,6 +61,7 @@ func Run(c chan bool) {
 	defer intCmd.Stop()
 
 	// Tell the world we are alive
+	log.Console("Announcing ourselves to the world")
 	go announce()
 
 	// Wait until told told to stop

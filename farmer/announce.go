@@ -46,7 +46,7 @@ func announce() {
 
 	dc := d.NewFuncClient(c)
 	// Add yourself to your seed node, the seed will tell everyone else
-	log.Console("Calling PeerAdd with iAm at",util.MyDNSServerIP)
+	log.Console("Telling",util.MyDNSServerIP,"that we are",iAm.WalletAddr)
 	_, err := dc.Call("PeerAdd", iAm)
 	if err != nil {
 		log.Critical("Accounce to seed", util.MyDNSServerIP, "failed:", err)

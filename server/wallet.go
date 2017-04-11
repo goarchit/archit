@@ -11,6 +11,7 @@ import (
 	"github.com/btcsuite/btcutil"
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"net"
 	"strconv"
 )
 
@@ -45,7 +46,7 @@ func Wallet(c chan string) {
 	// Start by opening the wallet
 
 	// Connect to local bitcoin core RPC server using HTTP POST mode.
-	host := config.Archit.WalletIP + ":" + strconv.Itoa(config.Archit.WalletPort)
+	host := net.JoinHostPort(config.Archit.WalletIP,strconv.Itoa(config.Archit.WalletPort))
 
 	log.Debug("Host: ", host)
 	log.Debug("User: ", config.Archit.WalletUser)

@@ -44,7 +44,7 @@ func dnsalive(i int, v string) {
 		Mutex.Unlock()
 		con.Close()
 		found = true
-		log.Console("DNSSeed",v,"is alive.")
+		log.Info("DNSSeed",v,"is alive.")
 	}
 	if !found && !IAmASeed {
 		log.Critical("No DNSSeeds are apparently active.  Sorry.")
