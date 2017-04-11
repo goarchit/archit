@@ -47,7 +47,7 @@ func PeerAdd(pi *PeerInfo) error {
 
 	// Decrement the hop count to prevent if not zero to prevent PeerAdd storms
 	if pi.HopCount == 0 {
-		return errors.New(util.OutOfHops)
+		return util.OutOfHops
 	}
 	pi.HopCount--
 
@@ -147,9 +147,9 @@ func peerListAdd(pl PeerList) {
 		log.Trace("Bulk request to add", k, v)
 		_, found := PeerMap.PL[k]
 		if found {
-			log.Console("Add request for",k,":already in map")
+			log.Console("Add request for",k,"already in map")
 		} else {
-			log.Console("Add request for",k,":is new!")
+			log.Console("Add request for",k,"is new!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
 			PeerMap.PL[k] = v

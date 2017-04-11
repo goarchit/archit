@@ -5,13 +5,13 @@
 package util
 
 import (
+	"errors"
 	"sync"
 )
 
 const MaxRaptor int = 12
 const ShardLen int = 1024
 const SeedPortBase string = ":1958"
-const OutOfHops string = "Out of hops"
 
 var WG sync.WaitGroup
 var Mutex sync.Mutex
@@ -23,6 +23,7 @@ var PublicIP string
 var DNSSeeds []string
 var MyDNSServerIP string
 var IAmASeed bool
+var OutOfHops = errors.New("Out of Hops")
 
 func init() {
 	FarmerStop = make(chan bool)
