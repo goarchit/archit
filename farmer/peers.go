@@ -97,7 +97,7 @@ func PeerAdd(pi *PeerInfo) string {
 			PeerMap.PL[pi.WalletAddr] = pm
 		}
 	} else {
-		log.Console("Peer", pi.WalletAddr," is new to the PeerList")
+		log.Console(pi.WalletAddr,"is new to the PeerList")
 		// Only allow the public key to be stored the first time
 		pm := PeerMap.PL[pi.WalletAddr]
 		pm.PublicKey = pi.Detail.PublicKey
@@ -115,7 +115,7 @@ func PeerAdd(pi *PeerInfo) string {
 			}
 			// Don't tell myself or the person that told me
 			if v.IPAddr != util.PublicIP && v.IPAddr != pi.SenderIP{
-				log.Console("We",util.PublicIP,"are about to tellNode",
+				log.Debug("We",util.PublicIP,"are about to tellNode",
 					v.IPAddr,"that we learned about",pi.Detail.IPAddr,
 					"from",pi.SenderIP)
 				go tellNode(pi)

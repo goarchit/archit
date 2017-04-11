@@ -41,16 +41,18 @@ func announce() {
 	defer c.Stop()
 
 	d := gorpc.NewDispatcher()
-	d.AddFunc("PeerAdd", func(pi *PeerInfo) string {return PeerAdd(pi)})
-        d.AddFunc("PeerListAll", func() string {return PeerListAll()})
+	d.AddFunc("PeerAdd", func() {})
+        d.AddFunc("PeerListAll", func() {})
 
 	dc := d.NewFuncClient(c)
 	// Add yourself to your seed node, the seed will tell everyone else
+	log.Console("Calling PeerAdd with iAm at",util.MyDNSServerIP)
 	_, err := dc.Call("PeerAdd", iAm)
 	if err != nil {
 		log.Critical("Accounce to seed", util.MyDNSServerIP, "failed:", err)
 	}
 	// Now go ask for all known nodes
+	log.Console("Calling PeerListAll at",util.MyDNSServerIP)
 	plstr, err := dc.Call("PeerListAll",nil)
 	if err != nil {
 		log.Critical("Attempt to get PeerList from seed", util.MyDNSServerIP, "failed:", err)
@@ -79,8 +81,9 @@ func tellNode(pi *PeerInfo) {
 	d := gorpc.NewDispatcher()
 	// Override SerderIP
 	pi.SenderIP = util.PublicIP
-	d.AddFunc("PeerAdd", func(pi *PeerInfo) string {return PeerAdd(pi)})
+	d.AddFunc("PeerAdd", func() {})
 	dc := d.NewFuncClient(c)
+	log.Console("Calling PeerAdd at",serverIP)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
 		if err.Error() != util.OutOfHops {
