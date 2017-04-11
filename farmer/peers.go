@@ -47,7 +47,7 @@ func PeerAdd(pi *PeerInfo) error {
 
 	// Decrement the hop count to prevent if not zero to prevent PeerAdd storms
 	if pi.HopCount == 0 {
-		return errors.New("Out of hops")
+		return errors.New(util.OutOfHops)
 	}
 	pi.HopCount--
 

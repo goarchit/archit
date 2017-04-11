@@ -11,6 +11,7 @@ import (
 const MaxRaptor int = 12
 const ShardLen int = 1024
 const SeedPortBase string = ":1958"
+const OutOfHops string = "Out of hops"
 
 var WG sync.WaitGroup
 var Mutex sync.Mutex

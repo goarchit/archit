@@ -79,9 +79,12 @@ func tellNode(pi *PeerInfo) {
 	// Override SerderIP
 	pi.SenderIP = util.PublicIP
 	d.AddFunc("PeerAdd", func(pi *PeerInfo) {})
+	d.AddFunc("PeerAdd", func(pi *PeerInfo) {})
 	dc := d.NewFuncClient(c)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
-		log.Warning("Announce to node", serverIP, "failed:", err)
-	} 
+		if err.Error()() != util.OutOfHops {
+			log.Warning("Announce to node", serverIP, "failed:", err)
+		}
+	}
 }
