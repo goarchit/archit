@@ -5,7 +5,6 @@ import (
 	"github.com/goarchit/archit/util"
 	"bytes"
 	"encoding/gob"
-	"errors"
 	"net"
 	"sync"
 )
@@ -41,7 +40,7 @@ func init() {
 	PeerMac = make(map[string]int)
 }
 
-func PeerAdd(pi *PeerInfo) error {
+func PeerAdd(pi *PeerInfo) string {
 	PeerMap.mutex.Lock()		// Needed?
 	defer PeerMap.mutex.Unlock()
 
@@ -62,15 +61,15 @@ func PeerAdd(pi *PeerInfo) error {
 	host, _, err := net.SplitHostPort(pi.Detail.IPAddr)
 	if err != nil {
 		log.Warning("PeerAdd: Received invalid IP address from", pi)
-		return err
+		return err.Error()
 	}
 	PeerIP[host] += 1
 	if PeerIP[host] > MaxIPsOrMacs {
-		return errors.New("Too many Farmers behind Public IP " + host)
+		return "Too many Farmers behind Public IP " + host
 	}
 	PeerMac[pi.Detail.MacAddr] += 1
 	if PeerMac[pi.Detail.MacAddr] > MaxIPsOrMacs {
-		return errors.New("Too many Farmers using MAC Address " + pi.Detail.MacAddr)
+		return "Too many Farmers using MAC Address " + pi.Detail.MacAddr
 	}
 
 	// Onward to the real processing
@@ -123,7 +122,7 @@ func PeerAdd(pi *PeerInfo) error {
 			}
 		}
 	}
-	return nil
+	return ""
 }
 
 func PeerDelete(p *Peer) error {
@@ -147,9 +146,9 @@ func peerListAdd(pl PeerList) {
 		log.Trace("Bulk request to add", k, v)
 		_, found := PeerMap.PL[k]
 		if found {
-			log.Console("Add request for",k,"already in map")
+			log.Debug(k,"already in map, ignored from peer")
 		} else {
-			log.Console("Add request for",k,"is new!")
+			log.Console(k,"added from peer!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
 			PeerMap.PL[k] = v

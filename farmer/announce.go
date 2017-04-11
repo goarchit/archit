@@ -41,8 +41,8 @@ func announce() {
 	defer c.Stop()
 
 	d := gorpc.NewDispatcher()
-	d.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
-        d.AddFunc("PeerListAll", func() string { return PeerListAll() })
+	d.AddFunc("PeerAdd", func(pi *PeerInfo) string {return PeerAdd(pi)})
+        d.AddFunc("PeerListAll", func() string {return PeerListAll()})
 
 	dc := d.NewFuncClient(c)
 	// Add yourself to your seed node, the seed will tell everyone else
@@ -79,11 +79,11 @@ func tellNode(pi *PeerInfo) {
 	d := gorpc.NewDispatcher()
 	// Override SerderIP
 	pi.SenderIP = util.PublicIP
-	d.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
+	d.AddFunc("PeerAdd", func(pi *PeerInfo) string {return PeerAdd(pi)})
 	dc := d.NewFuncClient(c)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
-		if err != util.OutOfHops {
+		if err.Error() != util.OutOfHops {
 			log.Warning("Announce to node", serverIP, "failed:", err)
 		}
 	}

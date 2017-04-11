@@ -26,9 +26,8 @@ func Run(c chan bool) {
 
 	// External RPC service first
 	// Start by registering fucntions and types
-	// gorpc.RegisterType(&Peer{})
 	extRPC.AddFunc("Ping", func() string { return "ePong!" })
-	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error { return PeerAdd(pi) })
+	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) string { return PeerAdd(pi) })
 	extRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 
 	// Then launch the server
