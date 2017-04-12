@@ -76,14 +76,109 @@ func Conf(needKey bool) {
 
 	// Initialize log system 
 	util.LogLevel = Archit.LogLevel
-	util.LogFile = Archit.LogFile
 	util.ResetLog = Archit.ResetLog
 	util.Verbose = Archit.Verbose
 	log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
 
-	// Start checking if the configuration file has a setting, and if a f;ag was set bu
-	// default, override with configuration file
-	value, err := conf.GetValue("", "PortBase")
+	// Start checking if the configuration file has a setting, and if a flag was set bu
+	// default, override with configuration file.  If no entry is found in the configuration
+	// file, and its a Core Setting, let it default
+	// Deal with those Core Settings first (see output of "archit settings" for list
+
+	value, err := conf.GetValue("", "DBDir")
+	if err == nil {
+		log.Debug("DBDir found in configuration file")
+		o := Parser.FindOptionByLongName("DBDir")
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", Archit.DBDir)
+			Archit.DBDir = value
+		}
+	}
+	util.DBDir = Archit.DBDir
+
+	// Need to patch up ~ in the database file name if it starts with that.
+	if len(util.DBDir) >= 2 && util.DBDir[:2] == "~/" {
+		usr, _ := user.Current()
+		dir := usr.HomeDir + "/"
+		util.DBDir = strings.Replace(util.DBDir, "~/", dir, 1)
+		log.Debug("DBDir expanded to", util.DBDir)
+	}
+
+	value, err = conf.GetValue("", "LogFile")
+	if err == nil {
+		log.Debug("Value of LogFile from config file:", value)
+		o := Parser.FindOptionByLongName("LogFile")
+		if o == nil {
+			log.Critical("Internal Parser error finding LogFile")
+		}
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", util.LogFile)
+			util.LogFile = value
+			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
+		}
+	}
+
+	value, err = conf.GetValue("", "LogLevel")
+	if err == nil {
+		log.Debug("Value of LogLevel from config file:", value)
+		o := Parser.FindOptionByLongName("LogLevel")
+		if o == nil {
+			log.Critical("Internal Parser error finding LogLevel")
+		}
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", util.LogLevel)
+			util.LogLevel, err  = strconv.Atoi(value)
+			if err != nil {
+				log.Critical(err)
+			}
+			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
+		}
+	}
+
+	value, err = conf.GetValue("", "ResetLog")
+	if err == nil {
+		log.Debug("Value of ResetLog from config file:", value)
+		o := Parser.FindOptionByLongName("ResetLog")
+		if o == nil {
+			log.Critical("Internal Parser error finding ResetLog")
+		}
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", util.ResetLog)
+			rl, err := strconv.ParseBool(value)
+			if err != nil {
+				log.Critical("Error in conf file, ResetLog =",err)
+			}
+			util.ResetLog = rl
+			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
+		}
+	}
+
+	value, err = conf.GetValue("", "Verbose")
+	if err == nil {
+		log.Debug("Value of Verbose from config file:", value)
+		o := Parser.FindOptionByLongName("Verbose")
+		if o == nil {
+			log.Critical("Internal Parser error finding Verbose")
+		}
+		if o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", util.Verbose)
+			util.Verbose, err  = strconv.Atoi(value)
+			if err != nil {
+				log.Critical(err)
+			}
+			if util.Verbose < 0 || util.Verbose > 2 {
+				log.Critical("Error in conf file, Verbose must be between 0 and 2")
+			}
+			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
+		}
+	}
+
+	// Everything below MAY not have flags, depending on the command being issues
+	// Note that NONE have a Archit. value, those only exist for Core Settings
+	// Each command is responsibile to copy their parsed flags into the util. variable it
+	// uses, so we are only concerned with conf file overrides
+
+	value, err = conf.GetValue("", "PortBase")
 	if err == nil {
 		log.Debug("Value of Port from config file:", value)
 		o := Parser.FindOptionByLongName("PortBase")
@@ -97,45 +192,6 @@ func Conf(needKey bool) {
 	}
 	if util.SeedMode && (util.PortBase != 1958) {
 		log.Critical("You want to be a seed?  PortBase must be set to 1958!")
-	}
-	value, err = conf.GetValue("", "LogLevel")
-	if err == nil {
-		log.Debug("Value of LogLevel from config file:", value)
-		o := Parser.FindOptionByLongName("LogLevel")
-		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.LogLevel)
-			util.LogLevel, err  = strconv.Atoi(value)
-			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
-			if err != nil {
-				log.Critical(err)
-			}
-		}
-	}
-	value, err = conf.GetValue("", "LogFile")
-	if err == nil {
-		log.Debug("Value of LogFile from config file:", value)
-		o := Parser.FindOptionByLongName("LogFile")
-		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.LogFile)
-			util.LogFile = value
-			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
-		}
-	}
-	value, err = conf.GetValue("", "DBDir")
-	if err == nil {
-		log.Debug("DBDir found in configuration file")
-		o := Parser.FindOptionByLongName("DBDir")
-		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.DBDir)
-			util.DBDir = value
-		}
-	}
-	// Need to patch up ~ in the database file name if it starts with that.
-	if len(util.DBDir) >= 2 && util.DBDir[:2] == "~/" {
-		usr, _ := user.Current()
-		dir := usr.HomeDir + "/"
-		util.DBDir = strings.Replace(util.DBDir, "~/", dir, 1)
-		log.Debug("DBDir expanded to", util.DBDir)
 	}
 
 	// Go out and determine our public IP address

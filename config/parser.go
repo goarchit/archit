@@ -15,7 +15,7 @@ type architCommand struct {
 	LogFile        string `short:"l" long:"LogFile" description:"Name of your logfile" default:"archit.log" env:"ARCHIT_LOGFILE"`
 	LogLevel       int    `short:"d" long:"LogLevel" description:"Logging level" default:"3" choice:"0" choice:"1" choice:"2" choice:"3" choice:"4" choice:"5" env:"ARCHIT_LOGLEVEL"`
 	ResetLog       bool   `short:"r" long:"ResetLog" description:"Reset the logfile when starting" env:"ARCHIT_RESETLOG"`
-	Verbose        int   `short:"v" long:"Verbosity" description:"Show additional messages" choice:"0" choice:"1" choice:"2" default:"0" env:"ARCHIT_VERBOSE"`
+	Verbose        int   `short:"v" long:"Verbose" description:"Show additional messages" choice:"0" choice:"1" choice:"2" default:"0" env:"ARCHIT_VERBOSE"`
 }
 
 var Archit architCommand

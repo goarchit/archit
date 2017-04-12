@@ -62,6 +62,7 @@ func (ec *SettingsCommand) Execute(args []string) error {
 	log.Console("    Conf =",util.Conf)
 	log.Console("    DBDir =",util.DBDir)
 	log.Console("    LogFile =",util.LogFile)
+	log.Console("    LogLevel =",util.LogLevel)
 	log.Console("    ResetLog =",util.ResetLog)
 	log.Console("    Verbose =",util.Verbose)
 	log.Console("\nOther SubCommand Settings from passed flags or ENV variables:")
