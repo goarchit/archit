@@ -5,7 +5,6 @@ package farmer
 import (
 	"encoding/gob"
 	"encoding/json"
-	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
@@ -23,7 +22,7 @@ func announce() {
 
 	iAm := new(PeerInfo)
 	iAm.SenderIP = util.PublicIP
-	iAm.WalletAddr = config.Archit.WalletAddr
+	iAm.WalletAddr = util.WalletAddr
 	iAm.HopCount = 2	// Once to my seed, once from there
 	iAm.Detail.IPAddr = util.PublicIP
 	iAm.Detail.MacAddr = "Invalid"
@@ -52,7 +51,7 @@ func announce() {
 		log.Critical("Accounce to seed", util.MyDNSServerIP, "failed:", err)
 	}
 	// Now go ask for all known nodes
-	log.Console("Calling PeerListAll at",util.MyDNSServerIP)
+	log.Console("Calling PeerListAll at seed",util.MyDNSServerIP)
 	plstr, err := dc.Call("PeerListAll",nil)
 	if err != nil {
 		log.Critical("Attempt to get PeerList from seed", util.MyDNSServerIP, "failed:", err)
@@ -86,8 +85,6 @@ func tellNode(pi *PeerInfo) {
 	log.Console("Calling PeerAdd at",serverIP)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
-		if err.Error() != util.OutOfHops {
-			log.Warning("Announce to node", serverIP, "failed:", err)
-		}
+		log.Warning("Announce to node", serverIP, "failed:", err)
 	}
 }

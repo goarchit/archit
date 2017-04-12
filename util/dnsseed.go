@@ -25,9 +25,12 @@ func Dnsseed() {
 		ip := v+SeedPortBase
 		if ip == PublicIP {
 			IAmASeed = true
-			log.Console("We are a seed node!  No storage farming allowed.")
+			log.Console("We are a registered seed node!")
 		}
 		go dnsalive(i,v)
+	}
+	if SeedMode && !IAmASeed {
+		log.Critical("Sorry, your public IP",PublicIP,"is not a registered seed node!")
 	}
 	WG.Wait()
 }

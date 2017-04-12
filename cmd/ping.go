@@ -7,6 +7,7 @@ package cmd
 import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
 	"fmt"
 	"net"
@@ -17,6 +18,8 @@ type PingCommand struct {
 	Internal bool `short:"i" long:"Internal" description:"Ping the internal server"`
 	External bool `short:"e" long:"External" description:"Ping the public facing server"`
 	TCP bool `short:"t" long:"TCP" description:"Ping server via TCP address"`
+        PortBase int  `short:"B" long:"PortBase" description:"Primary port number Archit servers will listen to. Port# +1 will be used interally for server communication" default:"1958" env:"ARCHIT_PORT"`
+
 }
 
 var pingCmd PingCommand
@@ -28,6 +31,7 @@ func init() {
 }
 
 func (ec *PingCommand) Execute(args []string) error {
+	util.PortBase = pingCmd.PortBase
 	config.Conf(false)
 
 	// Set default
@@ -38,10 +42,10 @@ func (ec *PingCommand) Execute(args []string) error {
 	/// Insert RPC code to query the farmer
 
 	if pingCmd.Internal {
-		port = config.Archit.PortBase + 1
+		port = util.PortBase + 1
 		serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	} else if pingCmd.External {
-		port = config.Archit.PortBase
+		port = util.PortBase
         	serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	} else if pingCmd.TCP {
         	fmt.Printf("Please enter a remote Host IP address in the form 1.2.3.4:1958 ")

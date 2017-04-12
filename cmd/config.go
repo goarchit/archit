@@ -24,8 +24,8 @@ func (ec *ConfigCommand) Execute(args []string) error {
 
 	util.Challenge()
 
-	log.Console(config.Archit.Conf+":\n")
-	f, err := ioutil.ReadFile(config.Archit.Conf)
+	log.Console(util.Conf+":\n")
+	f, err := ioutil.ReadFile(util.Conf)
 	if err != nil {
 		log.Console("Unable to open specified configuration file.")
 		return err

@@ -37,6 +37,7 @@ func (ec *SendCommand) Execute(args []string) error {
 
 	log.Console("Starting Send Command")
 	config.Conf(true) // Get the PIN and derive the key
+
 	db.Open()
 	defer db.Close()
 	log.Trace("Database open")
@@ -57,7 +58,7 @@ func (ec *SendCommand) Execute(args []string) error {
 	log.Trace("Read:", n1, "bytes read")
 	// Initial tblock
 	copy(tblock[:32*util.ShardLen-1], string(block[:]))
-	copy(tblock[32*util.ShardLen:32*util.ShardLen+32*config.Archit.Raptor], string(block[:]))
+	copy(tblock[32*util.ShardLen:32*util.ShardLen+32*util.Raptor], string(block[:]))
 
 	log.Trace("Starting DBRecord.Slice key determination")
 	hash, err := util.HashString(string(block[:]))
@@ -93,7 +94,7 @@ func (ec *SendCommand) Execute(args []string) error {
 	log.Trace("Housekeeping tasks starting")
 	db.FileInfo.Mutex.Lock()
 	s := db.FileInfo.Slices[util.SliceName]
-	s.Raptor = config.Archit.Raptor
+	s.Raptor = util.Raptor
 	db.FileInfo.Slices[util.SliceName] = s
 	db.FileInfo.Mutex.Unlock()
 	// DB File Information updates must be syncronouse since db.FileInfo is static

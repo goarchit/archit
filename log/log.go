@@ -34,7 +34,6 @@ func Setup(ll int, logfilename string, v int, resetLog bool) {
 	if verbose == 2 {
 		Console("VeryVerbose turned on, be prepared for a LOT of messages")
 	}
-	Info("Logging start in", logfilename)
 }
 
 func Critical(s ...interface{}) {

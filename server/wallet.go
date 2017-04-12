@@ -9,8 +9,8 @@ import (
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcrpcclient"
 	"github.com/btcsuite/btcutil"
-	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"net"
 	"strconv"
 )
@@ -46,15 +46,15 @@ func Wallet(c chan string) {
 	// Start by opening the wallet
 
 	// Connect to local bitcoin core RPC server using HTTP POST mode.
-	host := net.JoinHostPort(config.Archit.WalletIP,strconv.Itoa(config.Archit.WalletPort))
+	host := net.JoinHostPort(util.WalletIP,strconv.Itoa(util.WalletPort))
 
 	log.Debug("Host: ", host)
-	log.Debug("User: ", config.Archit.WalletUser)
-	//log.Debug("Password: '",config.Archit.WalletPassword,"'")
+	log.Debug("User: ", util.WalletUser)
+	//log.Debug("Password: '",util.WalletPassword,"'")
 	connCfg := &btcrpcclient.ConnConfig{
 		Host:         host,
-		User:         config.Archit.WalletUser,
-		Pass:         config.Archit.WalletPassword,
+		User:         util.WalletUser,
+		Pass:         util.WalletPassword,
 		HTTPPostMode: true, // Bitcoin core only supports HTTP POST mode
 		DisableTLS:   true, // Bitcoin core does not provide TLS by default
 	}
@@ -66,8 +66,8 @@ func Wallet(c chan string) {
 		log.Critical(err)
 	}
 	defer client.Shutdown()
-	log.Debug("Specified WalletAddr: ", config.Archit.WalletAddr)
-	addr, err := btcutil.DecodeAddress(config.Archit.WalletAddr, &imacredit)
+	log.Debug("Specified WalletAddr: ", util.WalletAddr)
+	addr, err := btcutil.DecodeAddress(util.WalletAddr, &imacredit)
 	if err != nil {
 		log.Critical("Wallet error: Invalid WalletAddr specified", err)
 	}

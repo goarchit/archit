@@ -110,3 +110,11 @@ A18) It is in a renters best interest to spread their data across as many reason
      farmer with the best reputation?) going offline.
 Q19) Why does Archit generate certification files?
 A19) This is a one time thing and required if your public IP ever changes.
+Q20) Why can I not store my KeyPIN in my configuration file?
+A20) Your KeyPIN is your last line of defense security wise, given that the KeyPass can be 
+     stored in the configuration file.  As such, it should never be written down.  If you
+     REALLY REALLY want to ignore this advise (highly not recommended) you can store it in
+     the ARCHIT_KEYPIN environment variable - but that will likely be visible to any other
+     users on your machine (although your KeyPass won't unless you made your conf file group
+     or world readable - which is also not advised.
+

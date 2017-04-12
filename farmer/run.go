@@ -2,9 +2,9 @@ package farmer
 
 import (
 	"github.com/briandowns/spinner"
-	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/server"
+	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
 	"net"
 	"strconv"
@@ -21,7 +21,9 @@ var extCmd *gorpc.Server
 func Run(c chan bool) {
 
 	// Start common services
-	go server.Wallet(walletCmd)
+	if !util.IAmASeed && !util.SeedMode {
+		go server.Wallet(walletCmd)
+	}
 	go server.DB(dbCmd)
 
 	// External RPC service first
@@ -31,7 +33,7 @@ func Run(c chan bool) {
 	extRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 
 	// Then launch the server
-	serverIP := ":" + strconv.Itoa(config.Archit.PortBase) // Listen on all interfaces
+	serverIP := ":" + strconv.Itoa(util.PortBase) // Listen on all interfaces
 	log.Console("Farmer External RPC Server using server address", serverIP)
 	extCmd = gorpc.NewTCPServer(serverIP, extRPC.NewHandlerFunc())
 	err := extCmd.Start()
@@ -50,7 +52,7 @@ func Run(c chan bool) {
 	intRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 
 	// Then launch the server
-	port := config.Archit.PortBase + 1
+	port := util.PortBase + 1
 	serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	log.Console("Farmer Internal RPC Server using server address", serverIP)
 	intCmd = gorpc.NewTCPServer(serverIP, intRPC.NewHandlerFunc())
@@ -61,7 +63,7 @@ func Run(c chan bool) {
 	defer intCmd.Stop()
 
 	// Tell the world we are alive
-	log.Console("Announcing ourselves to the world")
+	log.Trace("Announcing ourselves to the world")
 	go announce()
 
 	// Wait until told told to stop

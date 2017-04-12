@@ -4,19 +4,20 @@ package config
 
 import (
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"github.com/cmiceli/password-generator-go"
 	"os"
 )
 
 func genGoodConfig() {
 	// first, out with the old
-	log.Console("Error processinga",Archit.Conf," Building a basic file for you!")
+	log.Console("Error processinga",util.Conf," Building a basic file for you!")
 	os.Remove(Archit.Conf)
 	f, err := os.Create(Archit.Conf)
 	if err != nil {
                 log.Critical(err)
         } else {
-                log.Trace("Creating Basic", Archit.Conf)
+                log.Trace("Creating Basic", util.Conf)
 		
         }
 	defer f.Close()

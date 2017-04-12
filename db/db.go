@@ -10,7 +10,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/farmer"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
@@ -48,7 +47,7 @@ var db *bolt.DB
 func Open() {
 	var peerbytes bytes.Buffer
 	var err error
-	db, err = bolt.Open(config.Archit.DBDir+"/Archit.bolt", 0600,
+	db, err = bolt.Open(util.DBDir+"/Archit.bolt", 0600,
 		&bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		log.Critical(err)

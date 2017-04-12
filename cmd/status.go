@@ -8,13 +8,14 @@ import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/db"
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
 	"net"
 	"strconv"
 )
 
 type StatusCommand struct {
-        WalletAddr     string `long:"WalletAddr" short:"A" description:"IMACredit Adddress for identity and transactions - !!!Do not use the default!!!" default:"9KsqKMgLjzBWCidAAdy3pNn6jwbd9BT4Te" env:"ARCHIT_WALLETADDR"`
+        WalletAddr     string `long:"WalletAddr" short:"A" description:"IMACredit Adddress for identity and transactions - !!!Do not use the default!!!" default:"9Ks***INVALID***Ady3pNn6jwbd9BT4Te" env:"ARCHIT_WALLETADDR"`
         WalletIP       string `long:"WalletIP" short:"I" description:"IP name or address of IMACredit Wallet.  Recommend this be set in your archit configuration file" default:"localhost" env:"ARCHIT_WALLETIP"`
         WalletPort     int    `long:"WalletPort" short:"P" description:"IMACredit Wallets's RPCPort setting." default:"64096" env:"ARCHIT_WALLETPORT"`
         WalletUser     string `long:"WalletUser" short:"U" description:"IMACredit Wallet's RPCuser setting.  Recommend this be set in your archit configuration file" default:"ReplaceThis"`
@@ -29,6 +30,11 @@ func init() {
 }
 
 func (ec *StatusCommand) Execute(args []string) error {
+	util.WalletAddr = statusCmd.WalletAddr
+	util.WalletIP = statusCmd.WalletIP
+	util.WalletPort = statusCmd.WalletPort
+	util.WalletUser = statusCmd.WalletUser
+	util.WalletPassword = statusCmd.WalletPassword
 	config.Conf(false)
 
 	// Display local DB Stats
@@ -39,7 +45,7 @@ func (ec *StatusCommand) Execute(args []string) error {
 
 	// Insert RPC code to query the farmer
 
-	port := config.Archit.PortBase + 1
+	port := util.PortBase + 1
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	c := gorpc.NewTCPClient(serverIP)
 	c.Start()

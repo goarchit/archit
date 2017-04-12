@@ -7,8 +7,8 @@ package server
 import (
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"time"
 )
 
@@ -18,12 +18,12 @@ var err error
 
 func DB(c chan string) {
 	// Start the DBs
-	PeersDB, err = bolt.Open(config.Archit.DBDir+"/Peers.bolt", 0600, &bolt.Options{Timeout: 2 * time.Second})
+	PeersDB, err = bolt.Open(util.DBDir+"/Peers.bolt", 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		log.Critical("DB Error opening Peers.bolt:", err)
 	}
 	defer PeersDB.Close()
-	TrackingDB, err = bolt.Open(config.Archit.DBDir+"/Tracking.bolt", 0600, &bolt.Options{Timeout: 2 * time.Second})
+	TrackingDB, err = bolt.Open(util.DBDir+"/Tracking.bolt", 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		log.Critical("DB Error opening Tracking.bolt:", err)
 	}

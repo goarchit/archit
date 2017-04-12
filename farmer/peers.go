@@ -1,7 +1,6 @@
 package farmer
 
 import (
-	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"bytes"
@@ -72,7 +71,7 @@ func PeerAdd(pi *PeerInfo) string {
 	if PeerMac[pi.Detail.MacAddr] > MaxIPsOrMacs {
 		return "Too many Farmers using MAC Address " + pi.Detail.MacAddr
 	}
-	if pi.WalletAddr == config.Archit.WalletAddr {
+	if pi.WalletAddr == util.WalletAddr {
 		return ""  //  Just save outself a lot of processing when other seeds 
 	}		   //  tell us about outself
 	
@@ -113,7 +112,7 @@ func PeerAdd(pi *PeerInfo) string {
 	}
 
 	// If your a seed, do your duty and tell everyone
-	if util.IAmASeed {
+	if pi.HopCount > 0 && util.IAmASeed {
 		for _, v := range PeerMap.PL {
 			if err != nil {
 				log.Critical("Bad news, invalid entry in PeerMap.PL:",err)
@@ -152,8 +151,8 @@ func peerListAdd(pl PeerList) {
 		_, found := PeerMap.PL[k]
 		if found {
 			log.Debug(k,"already in map, ignored from peer")
-		} else if k != config.Archit.WalletAddr {
-			log.Console(k,"added from peer!")
+		} else if k != util.WalletAddr {
+			log.Console(k,"added from seed!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
 			PeerMap.PL[k] = v

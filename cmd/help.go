@@ -25,7 +25,6 @@ func (ec *HelpCommand) Execute(args []string) error {
 	log.Console("'archit -h' will display the list of all general command line options and commands\n")
 	log.Console("'archit <command> -h' will display the general help PLUS any command specific options\n")
 	log.Console("Suggest trying a 'archit send -h' as a good example.\n")
-	log.Console("Many flags can be set on any command. For example:  'archit -R 9 send' and 'archit send -R 9' both work as expected.\n")
 	log.Console("Note: -h, -help, and --help are all the same.")
 	return nil
 }
