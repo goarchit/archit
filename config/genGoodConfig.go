@@ -11,7 +11,7 @@ import (
 
 func genGoodConfig() {
 	// first, out with the old
-	log.Console("Error processinga",util.Conf," Building a basic file for you!")
+	log.Info("Error processinga",util.Conf," Building a basic KeyPass conf for you!")
 	os.Remove(Archit.Conf)
 	f, err := os.Create(Archit.Conf)
 	if err != nil {
@@ -22,5 +22,4 @@ func genGoodConfig() {
         }
 	defer f.Close()
  	f.Write([]byte("KeyPass = "+pwordgen.NewPassword(80)+"\n"))
-	log.Console("It is recommended you add WalletAddr, WalletUser & WalletPassword or specify them via the command line or environment variables!")
 }

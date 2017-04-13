@@ -26,8 +26,12 @@ type SendCommand struct {
 var sendCmd SendCommand
 
 func init() {
-	config.Parser.AddCommand("send", "Send a file [Fee!]", 
+	_,err := config.Parser.AddCommand("send", "Send a file [Fee!]", 
 		"Sends a file to the Archit network.  This cost IMAC to perform.  Use -C to add extra checks (rarely needed)", &sendCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Send command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *SendCommand) Execute(args []string) error {

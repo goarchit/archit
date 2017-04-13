@@ -22,7 +22,7 @@ func Run(c chan bool) {
 
 	// Start common services
 	if !util.IAmASeed && !util.SeedMode {
-		go server.Wallet(walletCmd)
+		go server.Wallet(walletCmd,true)
 	}
 	go server.DB(dbCmd)
 
@@ -34,7 +34,7 @@ func Run(c chan bool) {
 
 	// Then launch the server
 	serverIP := ":" + strconv.Itoa(util.PortBase) // Listen on all interfaces
-	log.Console("Farmer External RPC Server using server address", serverIP)
+	log.Info("Farmer External RPC Server using server address", serverIP)
 	extCmd = gorpc.NewTCPServer(serverIP, extRPC.NewHandlerFunc())
 	err := extCmd.Start()
 	if err != nil {
@@ -54,7 +54,7 @@ func Run(c chan bool) {
 	// Then launch the server
 	port := util.PortBase + 1
 	serverIP = net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
-	log.Console("Farmer Internal RPC Server using server address", serverIP)
+	log.Info("Farmer Internal RPC Server using server address", serverIP)
 	intCmd = gorpc.NewTCPServer(serverIP, intRPC.NewHandlerFunc())
 	err = intCmd.Start()
 	if err != nil {

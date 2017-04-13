@@ -10,6 +10,7 @@ import (
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"io/ioutil"
+	"fmt"
 	"os"
 	"os/signal"
 	"strconv"
@@ -28,7 +29,11 @@ type FarmCommand struct {
 var farmCmd FarmCommand
 
 func init() {
-	config.Parser.AddCommand("farm", "Start farming and earning IMAC[earn]", "Starts the ArchIt farming & wallet servers[Earn]", &farmCmd)
+	_,err := config.Parser.AddCommand("farm", "Start farming and earning IMAC[earn]", "Starts the ArchIt farming & wallet servers[Earn]", &farmCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Farm command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *FarmCommand) Execute(args []string) error {

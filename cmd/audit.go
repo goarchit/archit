@@ -7,6 +7,8 @@ package cmd
 import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"fmt"
+	"os"
 )
 
 type AuditCommand struct {
@@ -14,7 +16,11 @@ type AuditCommand struct {
 
 func init() {
 	auditCmd := AuditCommand{}
-	config.Parser.AddCommand("audit", "Perform various Archit network auditing tasks[Fee!]", "", &auditCmd)
+	_,err := config.Parser.AddCommand("audit", "Perform various Archit network auditing tasks[Fee!]", "", &auditCmd)
+	if err != nil {
+                fmt.Println("Internal error parsing Audit command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *AuditCommand) Execute(args []string) error {

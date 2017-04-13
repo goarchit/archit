@@ -7,6 +7,8 @@ package cmd
 import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"fmt"
+	"os"
 )
 
 type HelpCommand struct {
@@ -15,8 +17,12 @@ type HelpCommand struct {
 var helpCmd HelpCommand
 
 func init() {
-	config.Parser.AddCommand("help", "Help using --help", 
+	_,err := config.Parser.AddCommand("help", "Help using --help", 
 		"Really?  You need Help using the Help command?", &helpCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Help command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *HelpCommand) Execute(args []string) error {

@@ -8,6 +8,8 @@ import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
+	"fmt"
+	"os"
 	"net"
 )
 
@@ -16,7 +18,11 @@ type TestCommand struct {
 
 func init() {
 	testCmd := TestCommand{}
-	config.Parser.AddCommand("test", "Go functionality testing", "", &testCmd)
+	_,err := config.Parser.AddCommand("test", "Go functionality testing", "", &testCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Test command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *TestCommand) Execute(args []string) error {

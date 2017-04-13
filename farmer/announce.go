@@ -24,6 +24,7 @@ func announce() {
 	iAm.SenderIP = util.PublicIP
 	iAm.WalletAddr = util.WalletAddr
 	iAm.HopCount = 2	// Once to my seed, once from there
+	iAm.IsASeed = util.IAmASeed
 	iAm.Detail.IPAddr = util.PublicIP
 	iAm.Detail.MacAddr = "Invalid"
 	rifs := util.RoutedInterface("ip", net.FlagUp|net.FlagBroadcast)
@@ -55,7 +56,7 @@ func announce() {
 	plstr, err := dc.Call("PeerListAll",nil)
 	if err != nil {
 		log.Critical("Attempt to get PeerList from seed", util.MyDNSServerIP, "failed:", err)
-	} 
+	}
 	str, ok := plstr.(string)
 	if !ok {
 		log.Critical("Tellseed: dc.call(PeerListAll) did not return a string")

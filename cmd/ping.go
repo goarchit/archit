@@ -11,6 +11,7 @@ import (
 	"github.com/valyala/gorpc"
 	"fmt"
 	"net"
+	"os"
 	"strconv"
 )
 
@@ -27,7 +28,11 @@ var port int
 var serverIP string
 
 func init() {
-	config.Parser.AddCommand("ping", "Ping a service, expect a Pong", "", &pingCmd)
+	_,err := config.Parser.AddCommand("ping", "Ping a service, expect a Pong", "", &pingCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Ping command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *PingCommand) Execute(args []string) error {

@@ -9,6 +9,8 @@ import (
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"io/ioutil"
+	"fmt"
+	"os"
 )
 
 type ConfigCommand struct {
@@ -16,7 +18,11 @@ type ConfigCommand struct {
 
 func init() {
 	configCmd := ConfigCommand{}
-	config.Parser.AddCommand("config", "Displays your current configuration file", "", &configCmd)
+	_, err := config.Parser.AddCommand("config", "Displays your current configuration file", "", &configCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Config command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *ConfigCommand) Execute(args []string) error {

@@ -8,6 +8,8 @@ import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
+	"fmt"
+	"os"
 )
 
 type SettingsCommand struct {
@@ -31,8 +33,12 @@ type SettingsCommand struct {
 var settingsCmd SettingsCommand
 
 func init() {
-	config.Parser.AddCommand("settings", "Displays current settings", 
+	_,err := config.Parser.AddCommand("settings", "Displays current settings", 
 		"Displays all current settings.  Use -S to show passwords", &settingsCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Settings command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *SettingsCommand) Execute(args []string) error {

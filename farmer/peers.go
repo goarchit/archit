@@ -20,6 +20,7 @@ type PeerInfo struct {
 	SenderIP   string // including port
 	WalletAddr string
 	HopCount   int
+	IsASeed	   bool
 	Detail     Peer
 }
 
@@ -74,6 +75,9 @@ func PeerAdd(pi *PeerInfo) string {
 	if pi.WalletAddr == util.WalletAddr {
 		return ""  //  Just save outself a lot of processing when other seeds 
 	}		   //  tell us about outself
+	if pi.IsASeed {
+		return ""  //  Seeds are not peers and cannot handle data request
+	}
 	
 
 	// Onward to the real processing

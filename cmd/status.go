@@ -10,6 +10,8 @@ import (
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
+	"fmt"
+	"os"
 	"net"
 	"strconv"
 )
@@ -26,7 +28,11 @@ type StatusCommand struct {
 var statusCmd StatusCommand
 
 func init() {
-	config.Parser.AddCommand("status", "Shows the status of the ArchIt farming & wallet servers", "", &statusCmd)
+	_,err := config.Parser.AddCommand("status", "Shows the status of the ArchIt farming & wallet servers", "", &statusCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing Status command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *StatusCommand) Execute(args []string) error {

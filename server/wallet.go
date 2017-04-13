@@ -40,13 +40,13 @@ func init() {
 	}
 }
 
-func Wallet(c chan string) {
+func Wallet(c chan string, check bool) {
 	var err error
 
 	// Start by opening the wallet
 
 	// Connect to local bitcoin core RPC server using HTTP POST mode.
-	host := net.JoinHostPort(util.WalletIP,strconv.Itoa(util.WalletPort))
+	host := net.JoinHostPort(util.WalletIP, strconv.Itoa(util.WalletPort))
 
 	log.Debug("Host: ", host)
 	log.Debug("User: ", util.WalletUser)
@@ -66,16 +66,18 @@ func Wallet(c chan string) {
 		log.Critical(err)
 	}
 	defer client.Shutdown()
-	log.Debug("Specified WalletAddr: ", util.WalletAddr)
-	addr, err := btcutil.DecodeAddress(util.WalletAddr, &imacredit)
-	if err != nil {
-		log.Critical("Wallet error: Invalid WalletAddr specified", err)
-	}
-	_, err = client.ValidateAddress(addr)
-	if err != nil {
-		log.Critical("Wallet address validation error:", err,"\n Is the wallet running?")
-	} else {
-		log.Debug("Wallet address passes validation test")
+	if check {
+		log.Debug("Specified WalletAddr: ", util.WalletAddr)
+		addr, err := btcutil.DecodeAddress(util.WalletAddr, &imacredit)
+		if err != nil {
+			log.Critical("Wallet error: Invalid WalletAddr specified", err)
+		}
+		_, err = client.ValidateAddress(addr)
+		if err != nil {
+			log.Critical("Wallet address validation error:", err, "\n Is the wallet running?")
+		} else {
+			log.Debug("Wallet address passes validation test")
+		}
 	}
 
 	// Now go process commands
@@ -84,6 +86,8 @@ func Wallet(c chan string) {
 		switch cmd {
 		case "status":
 			c <- walletStatus()
+		case "generate":
+			c <- walletGenerate()
 		default:
 			log.Critical("Wallet passed unknown command", cmd)
 		}
@@ -115,4 +119,18 @@ func walletStatus() string {
 		response += fmt.Sprint("Account balance ", label, amount, "\n")
 	}
 	return response
+}
+
+func walletGenerate() string {
+	err := client.KeyPoolRefill()
+	if err != nil {
+		log.Critical("KeyPoolRefill error",err)
+	}
+	response, err := client.GetNewAddress(util.Account)
+	if err != nil {
+		log.Debug("Wallet Error getting new address for account",util.Account)
+		log.Critical(err)
+	}
+	log.Console("WalletGenerate response:",response)
+	return response.String()
 }

@@ -7,6 +7,8 @@ package cmd
 import (
 	"github.com/goarchit/archit/config"
 	"github.com/goarchit/archit/log"
+	"fmt"
+	"os"
 )
 
 type ListCommand struct {
@@ -14,7 +16,11 @@ type ListCommand struct {
 
 func init() {
 	listCmd := ListCommand{}
-	config.Parser.AddCommand("list", "List files stored in Archit network", "", &listCmd)
+	_,err := config.Parser.AddCommand("list", "List files stored in Archit network", "", &listCmd)
+        if err != nil {
+                fmt.Println("Internal error parsing List command:",err)
+                os.Exit(1)
+        }
 }
 
 func (ec *ListCommand) Execute(args []string) error {
