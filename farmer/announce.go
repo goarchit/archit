@@ -17,11 +17,9 @@ var FarmerMutex sync.Mutex
 
 func announce() {
 	var newPL PeerList
-	log.Console("Entering annouce()")
 
 	util.Dnsseed()
 
-	log.Console("Dnsseed() called")
 	iAm := new(PeerInfo)
 	iAm.SenderIP = util.PublicIP
 	iAm.WalletAddr = util.WalletAddr
@@ -34,7 +32,6 @@ func announce() {
 		iAm.Detail.MacAddr = rifs.HardwareAddr.String()
 	}
 	s, _ := json.Marshal(iAm)
-	log.Console("iAm complete")
 	log.Debug("iAm:", string(s))
 
 	// Active seed node already found in util.DNSsed() and stored in util.MyDNSServerIP

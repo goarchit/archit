@@ -37,6 +37,10 @@ func Dnsseed() {
 
 func dnsalive(i int, v string) {
 	var found bool
+	//  Don't call yourself!
+	if v == PublicIP {
+		return
+	}
 	defer WG.Done()
 	serverIP := v+SeedPortBase
 	con, err := net.DialTimeout("tcp", serverIP, time.Second*10)
