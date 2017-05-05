@@ -4,7 +4,10 @@
 
 package util
 
-import "net"
+import (
+	"strings"
+	"net"
+	)
 
 // IsMulticastCapable reports whether ifi is an IP multicast-capable
 // network interface. Network must be "ip", "ip4" or "ip6".
@@ -25,6 +28,7 @@ func IsMulticastCapable(network string, ifi *net.Interface) (net.IP, bool) {
 // network interface is not found. Network must be "ip", "ip4" or
 // "ip6".
 func RoutedInterface(network string, flags net.Flags) *net.Interface {
+	localIP := GetOutboundIP()
 	switch network {
 	case "ip", "ip4", "ip6":
 	default:
@@ -35,6 +39,14 @@ func RoutedInterface(network string, flags net.Flags) *net.Interface {
 		return nil
 	}
 	for _, ifi := range ift {
+		s, err := ifi.Addrs()
+		if err != nil {
+			continue
+		}
+		t := strings.Split(s[0].String() ,"/")[0]
+		if t != localIP {
+			continue
+		}
 		if ifi.Flags&flags != flags {
 			continue
 		}

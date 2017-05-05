@@ -7,7 +7,9 @@ package util
 import (
 	"bytes"
 	"github.com/goarchit/archit/log"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -39,4 +41,16 @@ func GetExtIP() string {
 	buf.ReadFrom(resp.Body)
 	s := buf.String()
 	return s[0 : len(s)-1]
+}
+
+//function to get the public ip address
+func GetOutboundIP() string {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Critical("Error getting outbound IP when connecting to 8.8.8.8", err)
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().String()
+	idx := strings.LastIndex(localAddr, ":")
+	return localAddr[0:idx]
 }

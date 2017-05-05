@@ -31,6 +31,8 @@ func (ec *TestCommand) Execute(args []string) error {
 	if rifs != nil {
 		log.Console("Routed interface is ", rifs.HardwareAddr.String())
 	}
+	log.Console("Internal IP: ",util.GetOutboundIP())
+	log.Console("External IP: ",util.GetExtIP())
 
 	log.Console("Testing complete")
 
