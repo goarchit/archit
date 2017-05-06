@@ -104,7 +104,7 @@ func PeerAdd(pi *PeerInfo) string {
 			PeerMap.PL[pi.WalletAddr] = pm
 		}
 	} else {
-		log.Console(pi.WalletAddr, "is new to the PeerList")
+		log.Console("Received new peer",pi.WalletAddr,"information from",pi.SenderIP)
 		// Only allow the public key to be stored the first time
 		pm := PeerMap.PL[pi.WalletAddr]
 		pm.PublicKey = pi.Detail.PublicKey

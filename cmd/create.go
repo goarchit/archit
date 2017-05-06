@@ -19,8 +19,8 @@ import (
 
 type CreateCommand struct {
 	Account string `short:"A" long:"Account" description:"Account name to use when talking with IMACredit wallet to generate a WalletAddr" default:"Archit"`
-        Conf    string `short:"c" long:"Conf" description:"Name of the conf file" required:"Y"`
-        DBDir   string `short:"b" long:"DBDir" description:"Path for persistance databases" required:"Y"`
+//        Conf    string `short:"c" long:"Conf" description:"Name of the conf file" required:"Y"`
+ //       DBDir   string `short:"b" long:"DBDir" description:"Path for persistance databases" required:"Y"`
 	Raptor  int    `short:"R" long:"Raptor" description:"Raptor factor - how many extra fountain blocks to generate (4-12)" default:"8" env:"ARCHIT_RAPTOR" choice:"4" choice:"5" choice:"6" choice:"7" choice:"8" choice:"9" choice:"10" choice:"11" choice:"12"`
 	PortBase       int    `short:"B" long:"PortBase" description:"Primary port number Archit servers will listen to. Port# +1 will be used interally for server communication" default:"1958"`
         WalletIP       string `long:"WalletIP" short:"I" description:"IP name or address of IMACredit Wallet.  Recommend this be set in your archit configuration file" default:"localhost" env:"ARCHIT_WALLETIP"`
@@ -44,8 +44,8 @@ func init() {
 func (ec *CreateCommand) Execute(args []string) error {
 	var walletCmd = make(chan string)
 
-	util.Conf = createCmd.Conf
-	util.DBDir = createCmd.DBDir
+//	util.Conf = createCmd.Conf
+//	util.DBDir = createCmd.DBDir
 	util.Raptor = createCmd.Raptor
 	util.PortBase = createCmd.PortBase
 	util.WalletIP = createCmd.WalletIP

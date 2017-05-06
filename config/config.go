@@ -196,6 +196,7 @@ func Conf(needKey bool) {
 
 	// Go out and determine our public IP address
 	util.PublicIP = net.JoinHostPort(util.GetExtIP(),strconv.Itoa(util.PortBase))
+	log.Console("Farming at IP",util.PublicIP)
 
 	//  Thats its... if you want to be a seed server...
 	if util.SeedMode {
