@@ -5,6 +5,7 @@ package util
 
 import (
 	"github.com/goarchit/archit/log"
+	"github.com/valyala/gorpc"
 	"net"
 	"time"
 )
@@ -50,13 +51,18 @@ func dnsalive(i int, v string) {
                 return
         }
 	serverIP := v+SeedPortBase
-	con, err := net.DialTimeout("tcp", serverIP, time.Second*10)
+	c := gorpc.NewTCPClient(serverIP)
+	c.Start()
+	defer c.Stop()
+        d := gorpc.NewDispatcher()
+        d.AddFunc("Ping", func() {})
+        dc := d.NewFuncClient(c)
+        _, err = dc.CallTimeout("Ping", nil, time.Second*5)
 	if err == nil {
-		Mutex.Lock()
+	//	Mutex.Lock()
 		// Any seed will do, so it doesn't matter who the last one is
 		MyDNSServerIP = serverIP
-		Mutex.Unlock()
-		con.Close()
+	//	Mutex.Unlock()
 		found = true
 		log.Info("DNSSeed",v,"is alive.")
 	}
