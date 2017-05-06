@@ -7,6 +7,7 @@ package log
 import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
+	"github.com/valyala/gorpc"
 	"os"
 )
 
@@ -34,6 +35,12 @@ func Setup(ll int, logfilename string, v int, resetLog bool) {
 	if verbose == 2 {
 		Console("VeryVerbose turned on, be prepared for a LOT of messages")
 	}
+	gorpc.SetErrorLogger(gorpclog)
+}
+
+func gorpclog(format string, args ...interface{}) {
+        s := fmt.Sprintf(format, args)
+        Debug(s)
 }
 
 func Critical(s ...interface{}) {
