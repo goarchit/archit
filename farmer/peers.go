@@ -120,7 +120,7 @@ func PeerAdd(pi *PeerInfo) string {
 		for _, v := range util.DNSSeeds {
 			ip := v + util.SeedPortBase
 			if ip != util.PublicIP {
-				go tellNode(pi)
+				go tellNode(pi,ip)
 			}
 		}
 
@@ -133,7 +133,7 @@ func PeerAdd(pi *PeerInfo) string {
 				log.Debug("We", util.PublicIP, "are about to tellNode",
 					v.IPAddr, "that we learned about", pi.Detail.IPAddr,
 					"from", pi.SenderIP)
-				go tellNode(pi)
+				go tellNode(pi,pi.Detail.IPAddr)
 			}
 		}
 	}

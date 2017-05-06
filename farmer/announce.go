@@ -76,10 +76,9 @@ func announce() {
 	log.Trace("Farmer node startup complete!")
 }
 
-func tellNode(pi *PeerInfo) {
+func tellNode(pi *PeerInfo, nodeIP string) {
 
-	serverIP := pi.Detail.IPAddr
-	c := gorpc.NewTCPClient(serverIP)
+	c := gorpc.NewTCPClient(nodeIP)
 	c.Start()
 	defer c.Stop()
 
@@ -88,9 +87,9 @@ func tellNode(pi *PeerInfo) {
 	pi.SenderIP = util.PublicIP
 	d.AddFunc("PeerAdd", func() {})
 	dc := d.NewFuncClient(c)
-	log.Console("Calling PeerAdd at",serverIP)
+	log.Console("Calling PeerAdd at",nodeIP)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
-		log.Warning("Announce to node", serverIP, "failed:", err)
+		log.Warning("Announce to node", nodeIP, "failed:", err)
 	}
 }
