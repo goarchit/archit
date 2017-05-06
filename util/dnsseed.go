@@ -37,11 +37,18 @@ func Dnsseed() {
 
 func dnsalive(i int, v string) {
 	var found bool
-	//  Don't call yourself!
-	if v == PublicIP {
-		return
-	}
 	defer WG.Done()
+        //  Don't call yourself!
+        pip,_,err := net.SplitHostPort(PublicIP)
+        if err != nil {
+                log.Critical("Error splitting PublicIP",err)
+        }
+        log.Trace("Checking IP",v,"against our PublicIP",pip,"?")
+	// Don't call yourself
+        if v == pip {
+                log.Trace("Skipping talking to ourselves as unhealthy")
+                return
+        }
 	serverIP := v+SeedPortBase
 	con, err := net.DialTimeout("tcp", serverIP, time.Second*10)
 	if err == nil {

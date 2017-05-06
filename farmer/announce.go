@@ -19,6 +19,10 @@ func announce() {
 	var newPL PeerList
 
 	util.Dnsseed()
+	if util.MyDNSServerIP == util.PublicIP {
+		log.Console("We are alone... so lonely... please start up another Seed node!")
+		return
+	}
 
 	iAm := new(PeerInfo)
 	iAm.SenderIP = util.PublicIP
@@ -35,6 +39,7 @@ func announce() {
 	log.Debug("iAm:", string(s))
 
 	// Active seed node already found in util.DNSsed() and stored in util.MyDNSServerIP
+
 
 	c := gorpc.NewTCPClient(util.MyDNSServerIP)
 	c.Start()
