@@ -9,26 +9,17 @@ import (
 	"sync"
 )
 
-type Peer struct {
-	IPAddr     string // including port
-	MacAddr    string
-	Reputation int64
-	PublicKey  string
-}
-
 type PeerInfo struct {
 	SenderIP   string // including port
 	WalletAddr string
 	HopCount   int
 	IsASeed    bool
-	Detail     Peer
+	Detail     util.Peer
 }
-
-type PeerList map[string]Peer // Indexed by Wallet Address
 
 var PeerMap struct {
 	mutex sync.Mutex
-	PL    PeerList
+	PL    util.PeerList
 }
 var PeerIP map[string]int  // Indexed by HostID
 var PeerMac map[string]int // Indexed by Mac Address
@@ -36,14 +27,12 @@ var PeerMac map[string]int // Indexed by Mac Address
 const MaxIPsOrMacs int = 50
 
 func init() {
-	PeerMap.PL = make(map[string]Peer)
+	PeerMap.PL = make(map[string]util.Peer)
 	PeerIP = make(map[string]int)
 	PeerMac = make(map[string]int)
 }
 
 func PeerAdd(pi *PeerInfo) string {
-	PeerMap.mutex.Lock() // Needed?
-	defer PeerMap.mutex.Unlock()
 
 	// Decrement the hop count to prevent if not zero to prevent PeerAdd storms
 	if pi.HopCount == 0 {
@@ -64,11 +53,15 @@ func PeerAdd(pi *PeerInfo) string {
 		log.Warning("PeerAdd: Received invalid IP address from", pi)
 		return err.Error()
 	}
+	util.Mutex.Lock()
 	PeerIP[host] += 1
+	util.Mutex.Unlock()
 	if PeerIP[host] > MaxIPsOrMacs {
 		return "Too many Farmers behind Public IP " + host
 	}
+	util.Mutex.Lock()
 	PeerMac[pi.Detail.MacAddr] += 1
+	util.Mutex.Unlock()
 	if PeerMac[pi.Detail.MacAddr] > MaxIPsOrMacs {
 		return "Too many Farmers using MAC Address " + pi.Detail.MacAddr
 	}
@@ -101,7 +94,9 @@ func PeerAdd(pi *PeerInfo) string {
 			change = true
 		}
 		if change {
+			PeerMap.mutex.Lock()
 			PeerMap.PL[pi.WalletAddr] = pm
+			PeerMap.mutex.Unlock()
 		}
 	} else {
 		log.Console("Received new peer",pi.WalletAddr,"information from",pi.SenderIP)
@@ -111,7 +106,9 @@ func PeerAdd(pi *PeerInfo) string {
 		pm.IPAddr = pi.Detail.IPAddr
 		pm.MacAddr = pi.Detail.MacAddr
 		pm.Reputation = 0
+		PeerMap.mutex.Lock()
 		PeerMap.PL[pi.WalletAddr] = pm
+		PeerMap.mutex.Unlock()
 	}
 
 	// If your a seed, do your duty and tell everyone
@@ -133,14 +130,14 @@ func PeerAdd(pi *PeerInfo) string {
 				log.Debug("We", util.PublicIP, "are about to tellNode",
 					v.IPAddr, "that we learned about", pi.Detail.IPAddr,
 					"from", pi.SenderIP)
-				go tellNode(pi,pi.Detail.IPAddr)
+				go tellNode(pi,v.IPAddr)
 			}
 		}
 	}
 	return ""
 }
 
-func PeerDelete(p *Peer) error {
+func PeerDelete(p *util.Peer) error {
 	return nil
 }
 
@@ -154,9 +151,7 @@ func PeerListAll() string {
 	return encBuf.String()
 }
 
-func peerListAdd(pl PeerList) {
-	PeerMap.mutex.Lock()
-	defer PeerMap.mutex.Unlock()
+func peerListAdd(pl util.PeerList) {
 	for k, v := range pl {
 		log.Trace("Bulk request to add", k, v)
 		_, found := PeerMap.PL[k]
@@ -166,7 +161,9 @@ func peerListAdd(pl PeerList) {
 			log.Console(k, "added from seed!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
+			PeerMap.mutex.Lock()
 			PeerMap.PL[k] = v
+			PeerMap.mutex.Unlock()
 		}
 	}
 }

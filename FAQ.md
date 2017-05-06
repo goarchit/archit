@@ -35,8 +35,7 @@ Q9)  Do I need to use port 1958 for archit?
 A9)  No, it is overrideable in the configuration file.
 
 Q10) Is there a chat board for this project?
-A10) Yes, currently hosted at http://farmbase.carpenter-farms.us:3000, plans are to host it
-     at http://chat.archit.it eventually (domain pending on project progress)
+A10) Yes, soon to be hosted at http://www.cryptocurrencytalk.org
 
 Q11) What is this "Raptor" setting?
 A11) Rator (short for Rapid Tornado) is a class of fountain codes that is used by Archit to provide
@@ -108,8 +107,10 @@ Q18) Why would I not ALWAYS want to send my shards to the highest rated farmers?
 A18) It is in a renters best interest to spread their data across as many reasonable farmers as 
      possible.  Doing so reduces the risk of having to recover multiple files due to a single (the
      farmer with the best reputation?) going offline.
+
 Q19) Why does Archit generate certification files?
 A19) This is a one time thing and required if your public IP ever changes.
+
 Q20) Why can I not store my KeyPIN in my configuration file?
 A20) Your KeyPIN is your last line of defense security wise, given that the KeyPass can be 
      stored in the configuration file.  As such, it should never be written down.  If you
@@ -118,3 +119,7 @@ A20) Your KeyPIN is your last line of defense security wise, given that the KeyP
      users on your machine (although your KeyPass won't unless you made your conf file group
      or world readable - which is also not advised.
 
+Q21) Do I need to run a farming node?
+A21) Yes, although you will be able to specify zero farming space in the future.  The 
+     farming node has the responsibility of maintaining your peers list, including
+     maintaining the reputation of all known farmers (not implemented yet).

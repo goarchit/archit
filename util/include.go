@@ -48,6 +48,17 @@ var Raptor int
 var KeyPass string
 var KeyPIN int
 
+// Peer structures used in several places
+
+type Peer struct {
+        IPAddr     string // including port
+        MacAddr    string
+        Reputation int64
+        PublicKey  string
+}
+
+type PeerList map[string]Peer // Indexed by Wallet Address
+
 func init() {
 	FarmerStop = make(chan bool)
 }

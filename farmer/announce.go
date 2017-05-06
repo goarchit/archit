@@ -3,8 +3,6 @@
 package farmer
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
@@ -16,7 +14,7 @@ import (
 var FarmerMutex sync.Mutex
 
 func announce() {
-	var newPL PeerList
+	var newPL util.PeerList
 	var iAm PeerInfo
 
 	util.Dnsseed()
@@ -48,7 +46,6 @@ func announce() {
 
 	d := gorpc.NewDispatcher()
 	d.AddFunc("PeerAdd", func() {})
-	d.AddFunc("PeerListAll", func() {})
 
 	dc := d.NewFuncClient(c)
 	if !util.IAmASeed {
@@ -61,23 +58,10 @@ func announce() {
 	}
 	// Now go ask for all known nodes
 	log.Console("Calling PeerListAll at seed", util.MyDNSServerIP)
-	plstr, err := dc.Call("PeerListAll", nil)
-	if err != nil {
-		log.Critical("Attempt to get PeerList from seed", util.MyDNSServerIP, "failed:", err)
-	}
-	str, ok := plstr.(string)
-	if !ok {
-		log.Critical("Tellseed: dc.call(PeerListAll) did not return a string")
-	}
-	buf := bytes.NewBufferString(str)
-	dec := gob.NewDecoder(buf)
-	err = dec.Decode(&newPL)
-	if err != nil {
-		log.Critical("Tellseed:  Error decoding PeerMap:", err)
-	}
+	newPL = util.GetPeerInfo(util.MyDNSServerIP)
 	peerListAdd(newPL)
 	if util.IAmASeed {
-		log.Console("Waiting for farmers to join the network.")
+		log.Console("Waiting for farmers to join the network")
 	} else {
 		log.Console("Farmer node startup complete!")
 	}
@@ -94,7 +78,7 @@ func tellNode(pi *PeerInfo, nodeIP string) {
 	pi.SenderIP = util.PublicIP
 	d.AddFunc("PeerAdd", func() {})
 	dc := d.NewFuncClient(c)
-	log.Console("Calling PeerAdd at", nodeIP)
+	log.Debug("Calling PeerAdd at", nodeIP)
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
 		log.Warning("Announce to node", nodeIP, "failed:", err)

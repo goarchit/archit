@@ -1,8 +1,7 @@
 // Cron.go - deal with all things that should happen occassionally
-package db
+package farmer
 
 import (
-	"github.com/goarchit/archit/farmer"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"net"
@@ -15,7 +14,7 @@ func CronHourly() {
 	for {
 		t := time.NewTimer(1 * time.Hour)
 		<-t.C
-		//	db.FlushPeerMap()	//  Update the PeerMap in the bolt database
+		FlushPeerMap()	//  Update the PeerMap in the bolt database
 	}
 }
 
@@ -37,7 +36,7 @@ func CronDaily() {
 			util.FarmerStop <- true
 			log.Warning("Sleeping 10 seconds before attempting restart")
 			time.Sleep(10 * time.Second)
-			go farmer.Run(util.FarmerStop)
+			go Run(util.FarmerStop)
 			log.Warning("Restart initiated, good luck!")
 		}
 	}

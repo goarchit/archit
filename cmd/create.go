@@ -5,98 +5,128 @@
 package cmd
 
 import (
-	"github.com/goarchit/archit/config"
-	"github.com/goarchit/archit/log"
-	"github.com/goarchit/archit/server"
-	"github.com/goarchit/archit/util"
-	"github.com/cmiceli/password-generator-go"
 	"errors"
 	"fmt"
+	"github.com/cmiceli/password-generator-go"
+	"github.com/goarchit/archit/config"
+	"github.com/goarchit/archit/farmer"
+	"github.com/goarchit/archit/log"
+	"github.com/goarchit/archit/util"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
 
 type CreateCommand struct {
 	Account string `short:"A" long:"Account" description:"Account name to use when talking with IMACredit wallet to generate a WalletAddr" default:"Archit"`
-//        Conf    string `short:"c" long:"Conf" description:"Name of the conf file" required:"Y"`
- //       DBDir   string `short:"b" long:"DBDir" description:"Path for persistance databases" required:"Y"`
-	Raptor  int    `short:"R" long:"Raptor" description:"Raptor factor - how many extra fountain blocks to generate (4-12)" default:"8" env:"ARCHIT_RAPTOR" choice:"4" choice:"5" choice:"6" choice:"7" choice:"8" choice:"9" choice:"10" choice:"11" choice:"12"`
+	//        Conf    string `short:"c" long:"Conf" description:"Name of the conf file" required:"Y"`
+	//       DBDir   string `short:"b" long:"DBDir" description:"Path for persistance databases" required:"Y"`
+	Raptor         int    `short:"R" long:"Raptor" description:"Raptor factor - how many extra fountain blocks to generate (4-12)" default:"8" env:"ARCHIT_RAPTOR" choice:"4" choice:"5" choice:"6" choice:"7" choice:"8" choice:"9" choice:"10" choice:"11" choice:"12"`
 	PortBase       int    `short:"B" long:"PortBase" description:"Primary port number Archit servers will listen to. Port# +1 will be used interally for server communication" default:"1958"`
-        WalletIP       string `long:"WalletIP" short:"I" description:"IP name or address of IMACredit Wallet.  Recommend this be set in your archit configuration file" default:"localhost" env:"ARCHIT_WALLETIP"`
-        WalletPort     int    `long:"WalletPort" short:"P" description:"IMACredit Wallets's RPCPort setting." default:"64096" env:"ARCHIT_WALLETPORT"`
-        WalletUser     string `long:"WalletUser" short:"U" description:"IMACredit Wallet's RPCuser setting.  Recommend this be set in your archit configuration file" required:"Y"`
-        WalletPassword string `long:"WalletPassword" short:"W" description:"IMACredit Wallet's RPCPassword settting.  HIGHLY recommend this be set in your archit configuration file" required:"Y"`
-
-
+	WalletIP       string `long:"WalletIP" short:"I" description:"IP name or address of IMACredit Wallet.  Recommend this be set in your archit configuration file" default:"localhost" env:"ARCHIT_WALLETIP"`
+	WalletPort     int    `long:"WalletPort" short:"P" description:"IMACredit Wallets's RPCPort setting." default:"64096" env:"ARCHIT_WALLETPORT"`
+	WalletUser     string `long:"WalletUser" short:"U" description:"IMACredit Wallet's RPCuser setting.  Recommend this be set in your archit configuration file" required:"Y"`
+	WalletPassword string `long:"WalletPassword" short:"W" description:"IMACredit Wallet's RPCPassword settting.  HIGHLY recommend this be set in your archit configuration file" required:"Y"`
+	Pretend        bool   `short:"p" long:"Pretend" description:"Display results instead of actually creating the configuration file"`
+	Silent	bool	`short:"s" long:"Silent" description:"Do not display contents of configuration file while creating"`
 }
 
 var createCmd CreateCommand
 
 func init() {
-	_,err := config.Parser.AddCommand("create", "Create a new conf file based on passed settings", "", &createCmd)
+	_, err := config.Parser.AddCommand("create", "Create a new conf file based on passed settings", "", &createCmd)
 	if err != nil {
-		fmt.Println("Internal error parsing Create command:",err)
+		fmt.Println("Internal error parsing Create command:", err)
 		os.Exit(1)
 	}
 }
 
 func (ec *CreateCommand) Execute(args []string) error {
 	var walletCmd = make(chan string)
+	var f *os.File
 
-//	util.Conf = createCmd.Conf
-//	util.DBDir = createCmd.DBDir
+	util.Conf = util.FullPath(config.Archit.Conf)
+
+	util.DBDir = config.Archit.DBDir
+	util.LogFile = config.Archit.LogFile
+	util.LogLevel = config.Archit.LogLevel
+	util.ResetLog = config.Archit.ResetLog
+	util.Verbose = config.Archit.Verbose
 	util.Raptor = createCmd.Raptor
 	util.PortBase = createCmd.PortBase
 	util.WalletIP = createCmd.WalletIP
 	util.WalletPort = createCmd.WalletPort
 	util.WalletUser = createCmd.WalletUser
 	util.WalletPassword = createCmd.WalletPassword
+	if createCmd.Pretend {
+		log.Console("Pretending!  Would create", util.Conf)
+	} else {
+		log.Console("Generating configuration file", util.Conf)
+		basedir := filepath.Dir(util.Conf)
+		err := os.MkdirAll(basedir, 0700)
+		if err != nil {
+			log.Critical("Error creating", basedir, ":", err)
+		}
 
-	os.Remove(util.Conf)
-
-	f, err := os.Create(util.Conf)
-	if err != nil {
-		log.Critical(err)
-	} 
-	defer f.Close()
-	util.KeyPass = pwordgen.NewPassword(80)
-	f.Write([]byte("KeyPass = "+util.KeyPass+"\n"))
-	f.Write([]byte("DBDir = "+util.DBDir+"\n"))
-	f.Write([]byte("Raptor = "+strconv.Itoa(util.Raptor)+"\n"))
-	f.Write([]byte("LogFile = "+util.LogFile+"\n"))
-	f.Write([]byte("LogLevel = "+strconv.Itoa(util.LogLevel)+"\n"))
-	f.Write([]byte("ResetLog = "+strconv.FormatBool(util.ResetLog)+"\n"))
-	f.Write([]byte("Verbose = "+strconv.Itoa(util.Verbose)+"\n"))
-	f.Write([]byte("PortBase = "+strconv.Itoa(util.PortBase)+"\n"))
-	f.Write([]byte("WalletIP = "+util.WalletIP+"\n"))
-	f.Write([]byte("WalletPort = "+strconv.Itoa(util.WalletPort)+"\n"))
-	f.Write([]byte("WalletUser = "+util.WalletUser+"\n"))
-	f.Write([]byte("WalletPassword = "+util.WalletPassword+"\n"))
-
-	go server.Wallet(walletCmd,false)
-	
-	// Tell Wallet server to generate an address
-        select {
-        case walletCmd <- "generate":
-        case <-time.After(10 * time.Second):
-                log.Console("IMACredit Wallet timed out - probably wasn't running.")
-		return errors.New("Create complete except for WalletAddr =")
-        }
-	util.WalletAddr = <- walletCmd
-
-	// Try a clean shutdown
-        select {
-        case walletCmd <- "stop":
-        case <-time.After(5 * time.Second):
-                log.Console("Odd, IMACredit Wallet timed out - probably wasn't running.")
-        }
-
-	f.Write([]byte("WalletAddr = "+util.WalletAddr+"\n"))
-	err = f.Close()
-	if err != nil {
-		log.Critical(err)
+		f, err = os.Create(util.Conf)
+		if err != nil {
+			log.Critical(err)
+		}
+		defer f.Close()
 	}
+	util.KeyPass = pwordgen.NewPassword(80)
+	write(f, "KeyPass = "+util.KeyPass)
+	write(f, "DBDir = "+util.DBDir)
+	write(f, "Raptor = "+strconv.Itoa(util.Raptor))
+	write(f, "LogFile = "+util.LogFile)
+	write(f, "LogLevel = "+strconv.Itoa(util.LogLevel))
+	write(f, "ResetLog = "+strconv.FormatBool(util.ResetLog))
+	write(f, "Verbose = "+strconv.Itoa(util.Verbose))
+	write(f, "PortBase = "+strconv.Itoa(util.PortBase))
+	write(f, "WalletIP = "+util.WalletIP)
+	write(f, "WalletPort = "+strconv.Itoa(util.WalletPort))
+	write(f, "WalletUser = "+util.WalletUser)
+	write(f, "WalletPassword = "+util.WalletPassword)
 
+	if createCmd.Pretend {
+		log.Console("WalletAddr = <autogenerated address>")
+	} else {
+		// OK, we need to cheat here and launch a wallet:
+		// Since we creating the configuration file, its a pretty good bet we 
+		// dont have a farming node up and running...
+		// Fortunately, the farming nodes codebase will work just fine for this
+
+		go farmer.Wallet(walletCmd, false)
+
+		// Tell Wallet server to generate an address
+		select {
+		case walletCmd <- "generate":
+		case <-time.After(10 * time.Second):
+			log.Console("IMACredit Wallet timed out - probably wasn't running.")
+			return errors.New("Create complete except for WalletAddr =")
+		}
+		util.WalletAddr = <-walletCmd
+
+		// Try a clean shutdown
+		select {
+		case walletCmd <- "stop":
+		case <-time.After(5 * time.Second):
+			log.Console("Odd, IMACredit Wallet timed out - probably wasn't running.")
+		}
+
+		write(f, "WalletAddr = "+util.WalletAddr)
+	}
 	return nil
+}
+
+func write(f *os.File, str string) {
+	if createCmd.Pretend {
+		log.Console(str)
+	} else {
+		f.Write([]byte(str+"\n"))
+		if !createCmd.Silent {
+			log.Console(str)
+		}
+	}
 }

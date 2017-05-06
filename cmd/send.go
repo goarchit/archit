@@ -11,7 +11,9 @@ import (
 	"github.com/goarchit/archit/db"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
+	"net"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -38,6 +40,7 @@ func (ec *SendCommand) Execute(args []string) error {
 	var block [32 * util.ShardLen]byte
 	var tblock [(32 + util.MaxRaptor) * util.ShardLen]byte
 	var iv [32 + util.MaxRaptor][aes.BlockSize]byte
+	// Go ahead and borrow file structures from the farmer codebase
 
 	log.Console("Starting Send Command")
 	config.Conf(true) // Get the PIN and derive the key
@@ -45,6 +48,11 @@ func (ec *SendCommand) Execute(args []string) error {
 	db.Open()
 	defer db.Close()
 	log.Trace("Database open")
+
+        port := util.PortBase + 1
+        serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
+	pl := util.GetPeerInfo(serverIP)
+	log.Console("Potential Peers:",pl)
 
 	filename := "LICENSE.md"
 	db.FileInfo.Filename = []byte(filename)

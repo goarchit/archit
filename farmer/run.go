@@ -3,7 +3,6 @@ package farmer
 import (
 	"github.com/briandowns/spinner"
 	"github.com/goarchit/archit/log"
-	"github.com/goarchit/archit/server"
 	"github.com/goarchit/archit/util"
 	"github.com/valyala/gorpc"
 	"net"
@@ -22,15 +21,18 @@ func Run(c chan bool) {
 
 	// Start common services
 	if !util.IAmASeed && !util.SeedMode {
-		go server.Wallet(walletCmd,true)
+		go Wallet(walletCmd,true)
 	}
-	go server.DB(dbCmd)
+	go DB(dbCmd)
 
 	// External RPC service first
 	// Start by registering fucntions and types
 	extRPC.AddFunc("Ping", func() string { return "ePong!" })
 	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) string { return PeerAdd(pi) })
-	extRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
+	// Only seed nodes can be queried for peer info from the outside world
+	if util.IAmASeed {
+		extRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
+	}
 
 	// Then launch the server
 	serverIP := ":" + strconv.Itoa(util.PortBase) // Listen on all interfaces
@@ -48,7 +50,7 @@ func Run(c chan bool) {
 	intRPC.AddFunc("Ping", func() string { return "iPong!" })
 	intRPC.AddFunc("Status", func() string { return Status() })
 	// intRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(wa,p)})
-	intRPC.AddFunc("PeerDelete", func(p *Peer) error { return PeerDelete(p) })
+	intRPC.AddFunc("PeerDelete", func(p *util.Peer) error { return PeerDelete(p) })
 	intRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 
 	// Then launch the server
