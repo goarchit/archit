@@ -19,6 +19,9 @@ var extCmd *gorpc.Server
 
 func Run(c chan bool) {
 
+	// Go look up seeds and set util.IAMASeed
+	util.Dnsseed()
+
 	// Start common services
 	if !util.IAmASeed && !util.SeedMode {
 		go Wallet(walletCmd,true)

@@ -17,7 +17,6 @@ func announce() {
 	var newPL util.PeerList
 	var iAm PeerInfo
 
-	util.Dnsseed()
 	if util.MyDNSServerIP == "" {
 		log.Console("We are alone... so lonely... please start up another Seed node!")
 		return
