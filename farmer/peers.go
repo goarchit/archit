@@ -24,6 +24,8 @@ var PeerMap struct {
 var PeerIP map[string]int  // Indexed by HostID
 var PeerMac map[string]int // Indexed by Mac Address
 
+var mapMutex sync.Mutex
+
 const MaxIPsOrMacs int = 50
 
 func init() {
@@ -53,15 +55,15 @@ func PeerAdd(pi *PeerInfo) string {
 		log.Warning("PeerAdd: Received invalid IP address from", pi)
 		return err.Error()
 	}
-	util.Mutex.Lock()
+	mapMutex.Lock()
 	PeerIP[host] += 1
-	util.Mutex.Unlock()
+	mapMutex.Unlock()
 	if PeerIP[host] > MaxIPsOrMacs {
 		return "Too many Farmers behind Public IP " + host
 	}
-	util.Mutex.Lock()
+	mapMutex.Lock()
 	PeerMac[pi.Detail.MacAddr] += 1
-	util.Mutex.Unlock()
+	mapMutex.Unlock()
 	if PeerMac[pi.Detail.MacAddr] > MaxIPsOrMacs {
 		return "Too many Farmers using MAC Address " + pi.Detail.MacAddr
 	}
