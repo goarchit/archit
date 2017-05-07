@@ -55,6 +55,7 @@ func Run(c chan bool) {
 	// intRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(wa,p)})
 	intRPC.AddFunc("PeerDelete", func(p *util.Peer) error { return PeerDelete(p) })
 	intRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
+	intRPC.AddFunc("PeerDBSync", func() error { return FlushPeerMap() })
 
 	// Then launch the server
 	port := util.PortBase + 1

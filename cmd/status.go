@@ -43,14 +43,6 @@ func (ec *StatusCommand) Execute(args []string) error {
 	util.WalletPassword = statusCmd.WalletPassword
 	config.Conf(false)
 
-	// Display local DB Stats
-        db.Open()
-        defer db.Close()
-        s := db.Status()
-        log.Console(s)
-
-	// Insert RPC code to query the farmer
-
 	port := util.PortBase + 1
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	c := gorpc.NewTCPClient(serverIP)
@@ -65,5 +57,12 @@ func (ec *StatusCommand) Execute(args []string) error {
 		log.Error("Status failed: ", err)
 	}
 	log.Console(response)
+
+	// Display local DB Stats
+        db.Open()
+        defer db.Close()
+        s := db.Status()
+        log.Console(s)
+
 	return nil
 }

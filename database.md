@@ -10,3 +10,9 @@ as part of reputation maintenance
 PeerInfo.bolt contains the connectivity and reputation information for everyone known.
 It is opened R/W by the farming instance.  Clients RPC request to the farming instance
 in order to get peering information and to adjust a peers reputation.
+
+Note that "archit backup" will create backup files of both databases, which you can then
+run commands like "bolt info" and "bolt stats" against
+
+Do NOT be surprised with the number of records seems low. Items like the entire Peer List are
+stored as a single record.

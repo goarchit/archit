@@ -14,6 +14,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
+	"path/filepath"
 	"io"
 	"sync"
 	"time"
@@ -48,8 +49,8 @@ func Open() {
 
 	var err error
 
-	fileDB, err = bolt.Open(util.DBDir+"/FileInfo.bolt", 0600,
-		&bolt.Options{Timeout: 2 * time.Second})
+	dbName := filepath.Join(util.DBDir,util.FileDBName)
+	fileDB, err = bolt.Open(dbName, 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		log.Critical(err)
 	}
@@ -68,6 +69,13 @@ func Open() {
 
 func Close() {
 	fileDB.Close()
+}
+
+func Sync() {
+	err := fileDB.Sync()
+	if err != nil {
+		log.Critical("FileInfo.bolt error syncing database to disk:",err)
+	}
 }
 
 func FileUpdate() {
@@ -110,7 +118,7 @@ func FileUpdate() {
 
 func Status() string {
 	stats := fileDB.Stats()
-	response := fmt.Sprintf("FileInfo.bolt Reads: %d, Writes: %d, Nodes: %d, Rebalances: %d  Splits: %d\n",
+	response := fmt.Sprintf("FileInfo.bolt Reads: %d, Writes: %d, Nodes: %d, Rebalances: %d  Splits: %d",
 		stats.TxN, stats.TxStats.Write, stats.TxStats.NodeCount, stats.TxStats.Rebalance, stats.TxStats.Split)
 	return response
 }

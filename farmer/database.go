@@ -16,6 +16,7 @@ import (
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
 	"time"
+	"path/filepath"
 )
 
 const PeersBucket = "PeersBucket"
@@ -27,7 +28,8 @@ func DB(c chan string) {
 	var peerbytes bytes.Buffer
 
 	// Start the DBs
-	peersDB, err = bolt.Open(util.DBDir+"/PeerInfo.bolt", 0600, &bolt.Options{Timeout: 2 * time.Second})
+	dbName := filepath.Join(util.DBDir,util.PeerDBName)
+	peersDB, err = bolt.Open(dbName, 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		log.Critical("DB Error opening PeerInfo.bolt:", err)
 	}
@@ -75,12 +77,12 @@ func DB(c chan string) {
 
 func dbStatus() string {
 	stats := peersDB.Stats()
-	response := fmt.Sprintf("PeerInfo.bolt Reads: %d, Writes: %d, Nodes: %d, Rebalances: %d  Splits: %d\n",
+	response := fmt.Sprintf("PeerInfo.bolt Reads: %d, Writes: %d, Nodes: %d, Rebalances: %d  Splits: %d",
 		stats.TxN, stats.TxStats.Write, stats.TxStats.NodeCount, stats.TxStats.Rebalance, stats.TxStats.Split)
 	return response
 }
 
-func FlushPeerMap() {
+func FlushPeerMap() error {
 	var encBuf bytes.Buffer
 
 	err := peersDB.Update(func(tx *bolt.Tx) error {
@@ -102,10 +104,12 @@ func FlushPeerMap() {
 		return nil
 	})
 	if err != nil {
-		log.Critical("PeerInfo.bolt Put error updating PeerMap: ", err)
+		return err
 	}
 	err = peersDB.Sync()
 	if err != nil {
-		log.Critical("PeerInfo.bolt error syncing database to disk: ", err)
+		return err
 	}
+	log.Console("Peer info flushed to database")
+	return nil
 }

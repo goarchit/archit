@@ -111,6 +111,7 @@ func (ec *SendCommand) Execute(args []string) error {
 	db.FileInfo.Mutex.Unlock()
 	// DB File Information updates must be syncronouse since db.FileInfo is static
 	db.FileUpdate()
+	db.Sync()	// Flush new info to disk
 
 	log.Console("Sending complete (not really, this is still test code working up to that}")
 

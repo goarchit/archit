@@ -8,12 +8,16 @@ import (
 	"github.com/valyala/gorpc"
 	"net"
 	"time"
+	"math/rand"
 )
+
+var aliveDNSes []string
 
 func Dnsseed() {
 	var err error
 
 	DNSSeeds, err = net.LookupHost("dnsseed.goarchit.online")
+	aliveDNSes = make([]string,0)
 	if err != nil {
                 log.Critical("Failure to lookup dnsseed.goarchit.online")
         }
@@ -27,13 +31,18 @@ func Dnsseed() {
 		if ip == PublicIP {
 			IAmASeed = true
 			log.Console("We are a registered seed node!")
+		} else {
+			go dnsalive(i,v)
 		}
-		go dnsalive(i,v)
 	}
 	if SeedMode && !IAmASeed {
 		log.Critical("Sorry, your public IP",PublicIP,"is not a registered seed node!")
 	}
 	WG.Wait()
+	log.Debug(len(aliveDNSes),"DNSes found alive")
+	rand.Seed(time.Now().UnixNano())
+	MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)]+SeedPortBase
+	log.Console("Associating ourselves with DNSSeed",MyDNSServerIP)
 }
 
 func dnsalive(i int, v string) {
@@ -59,10 +68,11 @@ func dnsalive(i int, v string) {
         dc := d.NewFuncClient(c)
         _, err = dc.CallTimeout("Ping", nil, time.Second*5)
 	if err == nil {
-	//	Mutex.Lock()
-		// Any seed will do, so it doesn't matter who the last one is
-		MyDNSServerIP = serverIP
-	//	Mutex.Unlock()
+		// Add mutexes just to be safe
+		Mutex.Lock()
+		// Add to current up list
+		aliveDNSes = append(aliveDNSes, v)
+		Mutex.Unlock()
 		found = true
 		log.Info("DNSSeed",v,"is alive.")
 	}

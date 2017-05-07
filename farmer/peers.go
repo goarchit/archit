@@ -76,7 +76,7 @@ func PeerAdd(pi *PeerInfo) string {
 
 	val, found := PeerMap.PL[pi.WalletAddr]
 	if found {
-		log.Console(pi.WalletAddr, "entering network per", pi.SenderIP)
+		log.Info(pi.WalletAddr, "entering network per", pi.SenderIP)
 		pm := PeerMap.PL[pi.WalletAddr]
 		change := false
 		if val.IPAddr != pi.Detail.IPAddr {
@@ -99,7 +99,7 @@ func PeerAdd(pi *PeerInfo) string {
 			PeerMap.mutex.Unlock()
 		}
 	} else {
-		log.Console("Received new peer",pi.WalletAddr,"information from",pi.SenderIP)
+		log.Info("Received new peer",pi.WalletAddr,"information from",pi.SenderIP)
 		// Only allow the public key to be stored the first time
 		pm := PeerMap.PL[pi.WalletAddr]
 		pm.PublicKey = pi.Detail.PublicKey
@@ -158,7 +158,7 @@ func peerListAdd(pl util.PeerList) {
 		if found {
 			log.Debug(k, "already in map, ignored from peer")
 		} else if k != util.WalletAddr {
-			log.Console(k, "added from seed!")
+			log.Info(k, "added from seed!")
 			// Don't allow sender to set initial Reputation
 			v.Reputation = 0
 			PeerMap.mutex.Lock()

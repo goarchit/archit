@@ -9,7 +9,7 @@ import (
 func Status() string {
 	walletCmd <- "status"
 	response := <-walletCmd
-	response += "\n# of Peers: "+strconv.Itoa(len(PeerMap.PL))+" ["
+	response += "\n"+strconv.Itoa(len(PeerMap.PL))+" Peers: ["
 	count := 0
 	for _, v := range PeerMap.PL {
 		count++
@@ -17,10 +17,7 @@ func Status() string {
 		if count > 50 { break }
 		response += v.IPAddr + " "
 	}
-	response += "]\n\nDatabase Statuses:\n"
-	dbCmd <- "status"
-	response += <-dbCmd
-	response += "\nInternal RPC Stats: "
+	response += "\n\nInternal RPC Stats: "
 	s, err := json.Marshal(intCmd.Stats)
 	if err != nil {
 		log.Critical("Farmer status() error Marshaling intCmd.Stats")
@@ -32,6 +29,9 @@ func Status() string {
 		log.Critical("Farmer status() error Marshaling extCmd.Stats")
 	}
 	response += string(s)+"\n"
+	response += "]\n\nDatabase statuses since last open:\n"
+	dbCmd <- "status"
+	response += <-dbCmd
 	log.Info("Farmer Status returning:\n", response)
 	return response
 }
