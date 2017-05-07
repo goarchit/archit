@@ -31,10 +31,10 @@ func Dnsseed() {
 		if ip == PublicIP {
 			IAmASeed = true
 			log.Console("We are a registered seed node!")
-			WG.Done()
-		} else {
-			go dnsalive(i,v)
-		}
+		} 
+		// Yes, we really do want to do them all, including ourselves!  You have been warned!
+
+		go dnsalive(i,v)
 	}
 	if SeedMode && !IAmASeed {
 		log.Critical("Sorry, your public IP",PublicIP,"is not a registered seed node!")
