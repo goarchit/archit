@@ -31,10 +31,10 @@ func Dnsseed() {
 		if ip == PublicIP {
 			IAmASeed = true
 			log.Console("We are a registered seed node!")
+			WG.Done()
+		} else {
+			go dnsalive(i, v)
 		}
-		// Yes, we really do want to do them all, including ourselves!  You have been warned!
-
-		go dnsalive(i, v)
 	}
 	if SeedMode && !IAmASeed {
 		log.Critical("Sorry, your public IP", PublicIP, "is not a registered seed node!")
@@ -46,10 +46,8 @@ func Dnsseed() {
 		rand.Seed(time.Now().UnixNano())
 		MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)] + SeedPortBase
 		log.Console("Associating ourselves with DNSSeed", MyDNSServerIP)
-	} else {
-	// Shouldn't need, but just to be safe
-		MyDNSServerIP = PublicIP
-	}
+	} 
+	// Nil MyDNSServerIP is used as flag for 1st DNSSeed
 }
 
 func dnsalive(i int, v string) {
@@ -60,7 +58,7 @@ func dnsalive(i int, v string) {
 	if err != nil {
 		log.Critical("Error splitting PublicIP", err)
 	}
-	log.Trace("Checking IP", v, "against our PublicIP", pip, "?")
+	log.Trace("Checking if IP", v, "is our PublicIP", pip, "?")
 	// Don't call yourself
 	if v == pip {
 		log.Trace("Skipping talking to ourselves as unhealthy")
