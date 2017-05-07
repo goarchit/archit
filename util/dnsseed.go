@@ -41,7 +41,7 @@ func Dnsseed() {
 	}
 	WG.Wait()
 
-	log.Debug("IAmASeed =",IAmASeed,"len(aliveDNSes) =",len(aliveDNSes)
+	log.Debug("IAmASeed =",IAmASeed,"len(aliveDNSes) =",len(aliveDNSes))
 
 	if !IAmASeed || len(aliveDNSes) > 0 {
 		log.Debug(len(aliveDNSes), "DNSes found alive")
