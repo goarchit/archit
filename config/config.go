@@ -12,7 +12,6 @@ import (
 	"golang.org/x/crypto/scrypt"
 	"net"
 	"os"
-	"os/user"
 	"strconv"
 	"strings"
 )
@@ -48,21 +47,8 @@ func Conf(needKey bool) {
 	// And off to read the configuration file.  Command line parameters will need to trump
 
 	// Need to patch up ~ in the configuration & log file name if it starts with that.
-	if len(Archit.Conf) >= 2 && Archit.Conf[:2] == "~/" {
-		usr, _ := user.Current()
-		dir := usr.HomeDir + "/"
-		Archit.Conf = strings.Replace(Archit.Conf, "~/", dir, 1)
-		log.Debug("Conf expanded to", Archit.Conf)
-	}
-	util.Conf = Archit.Conf
-
-	if len(Archit.LogFile) >= 2 && Archit.LogFile[:2] == "~/" {
-		usr, _ := user.Current()
-		dir := usr.HomeDir + "/"
-		Archit.LogFile = strings.Replace(Archit.LogFile, "~/", dir, 1)
-		log.Debug("LogFile expanded to", Archit.LogFile)
-	}
-	util.LogFile = Archit.LogFile
+	util.Conf = util.FullPath(Archit.Conf)
+	util.LogFile = util.FullPath(Archit.LogFile)
 
 	conf, err := goconfig.LoadConfigFile(util.Conf)
 	if err != nil {
@@ -94,15 +80,7 @@ func Conf(needKey bool) {
 			Archit.DBDir = value
 		}
 	}
-	util.DBDir = Archit.DBDir
-
-	// Need to patch up ~ in the database file name if it starts with that.
-	if len(util.DBDir) >= 2 && util.DBDir[:2] == "~/" {
-		usr, _ := user.Current()
-		dir := usr.HomeDir + "/"
-		util.DBDir = strings.Replace(util.DBDir, "~/", dir, 1)
-		log.Debug("DBDir expanded to", util.DBDir)
-	}
+	util.DBDir = util.FullPath(Archit.DBDir)
 
 	value, err = conf.GetValue("", "LogFile")
 	if err == nil {
@@ -329,6 +307,29 @@ func Conf(needKey bool) {
 			log.Critical("WalletPassword error")
 		}
 	}
+	value, err = conf.GetValue("", "MinFreeSpace")
+	if err == nil {
+		log.Debug("Value of MinFreeSpace from config file:", value)
+		o := Parser.FindOptionByLongName("MinFreeSpace")
+		if o == nil || o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", util.MinFreeSpace)
+			minFreeSpace, err := strconv.Atoi(value)
+			if err != nil {
+				log.Critical(err)
+			}
+			util.MinFreeSpace = uint64(minFreeSpace)
+		}
+	}
+	value, err = conf.GetValue("", "DataDir")
+	if err == nil {
+		log.Debug("Value of DataDir from config file:", value)
+		o := Parser.FindOptionByLongName("DataDir")
+		if o == nil || o.IsSetDefault() {
+			log.Debug("Configuration value of", value, "overriding default value", util.DataDir)
+			util.DataDir = value
+		}
+	}
+	util.DataDir = util.FullPath(util.DataDir)
 	// Build the encryption Matrix
 	util.BuildMatrix()
 	// Make sure we have valud certification files

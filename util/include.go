@@ -8,6 +8,7 @@ import (
 	"sync"
 )
 
+const GB uint64 = 1024*1024*1024
 const MaxRaptor int = 12
 const ShardLen int = 1024
 const SeedPortBase  = ":1958"
@@ -49,6 +50,8 @@ var Chaos bool
 var Raptor int
 var KeyPass string
 var KeyPIN int
+var MinFreeSpace uint64
+var DataDir string
 
 // Peer structures used in several places
 

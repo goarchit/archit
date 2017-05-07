@@ -52,7 +52,7 @@ func Dnsseed() {
 			MyDNSServerIP = aliveDNSes[0] + SeedPortBase
 		}
 
-		log.Console("Associating ourselves,", PublicIP, ", with DNSSeed", MyDNSServerIP)
+		log.Info("We,", PublicIP, ", are using DNSSeed", MyDNSServerIP)
 	} 
 	// Nil MyDNSServerIP is used as flag for 1st DNSSeed
 }

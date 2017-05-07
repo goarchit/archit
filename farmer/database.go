@@ -50,7 +50,7 @@ func DB(c chan string) {
 		if err != nil {
 			log.Critical("Error decoding PeerMap:", err)
 		}
-		log.Console("PeerMap successfully loaded with", len(PeerMap.PL), "entries")
+		log.Console(len(PeerMap.PL), "Peers now known")
 		log.Trace("PeerMap loaded:", PeerMap.PL)
 	} else {
 		log.Debug("PeerMap database was empty")
@@ -110,6 +110,6 @@ func FlushPeerMap() error {
 	if err != nil {
 		return err
 	}
-	log.Console(len(PeerMap.PL)," Peers of info flushed to database")
+	log.Info("Information on",len(PeerMap.PL),"Peers flushed to persistant database")
 	return nil
 }

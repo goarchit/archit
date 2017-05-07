@@ -20,6 +20,6 @@ func FullPath(path string) string {
 	if err != nil {
 		log.Critical("Error getting absolute pathname from",fullpath,":",err)
 	}
-        log.Trace(path,"expanded to", fullpath)
+        log.Debug(path,"expanded to", fullpath)
 	return fullpath
 }
