@@ -45,8 +45,13 @@ func Dnsseed() {
 
 	if !IAmASeed || len(aliveDNSes) > 0 {
 		log.Debug(len(aliveDNSes), "DNSes found alive")
-		rand.Seed(time.Now().UnixNano())
-		MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)] + SeedPortBase
+		if len(aliveDNS) > 1 {
+			rand.Seed(time.Now().UnixNano())
+			MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)] + SeedPortBase
+		} else {
+			MyDNSServerIP = aliveDNSes[0] + SeedPortBase
+		}
+
 		log.Console("Associating ourselves with DNSSeed", MyDNSServerIP)
 	} 
 	// Nil MyDNSServerIP is used as flag for 1st DNSSeed
