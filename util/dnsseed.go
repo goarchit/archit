@@ -31,6 +31,7 @@ func Dnsseed() {
 		if ip == PublicIP {
 			IAmASeed = true
 			log.Console("We are a registered seed node!")
+			WG.Done()
 		} else {
 			go dnsalive(i,v)
 		}
@@ -39,6 +40,7 @@ func Dnsseed() {
 		log.Critical("Sorry, your public IP",PublicIP,"is not a registered seed node!")
 	}
 	WG.Wait()
+
 	log.Debug(len(aliveDNSes),"DNSes found alive")
 	rand.Seed(time.Now().UnixNano())
 	MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)]+SeedPortBase
