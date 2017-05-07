@@ -45,7 +45,7 @@ func Dnsseed() {
 
 	if !IAmASeed || len(aliveDNSes) > 0 {
 		log.Debug(len(aliveDNSes), "DNSes found alive")
-		if len(aliveDNS) > 1 {
+		if len(aliveDNSes) > 1 {
 			rand.Seed(time.Now().UnixNano())
 			MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)] + SeedPortBase
 		} else {
