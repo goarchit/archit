@@ -19,9 +19,6 @@ var extCmd *gorpc.Server
 
 func Run(c chan bool) {
 
-	// Go look up seeds and set util.IAMASeed
-	util.Dnsseed()
-
 	// Start common services
 	if !util.IAmASeed && !util.SeedMode {
 		go Wallet(walletCmd,true)
@@ -32,10 +29,7 @@ func Run(c chan bool) {
 	// Start by registering fucntions and types
 	extRPC.AddFunc("Ping", func() string { return "ePong!" })
 	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) string { return PeerAdd(pi) })
-	// Only seed nodes can be queried for peer info from the outside world
-	if util.IAmASeed {
-		extRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
-	}
+	extRPC.AddFunc("PeerListAll", func() string { return PeerListExt() })
 
 	// Then launch the server
 	serverIP := ":" + strconv.Itoa(util.PortBase) // Listen on all interfaces
@@ -67,6 +61,10 @@ func Run(c chan bool) {
 		log.Critical("Farmer Internal RPC service failed to start: ", err)
 	}
 	defer intCmd.Stop()
+
+	// Now that RCP functions are defined, go gather DNS information
+	log.Trace("Gathering DNS information")
+	util.Dnsseed()
 
 	// Tell the world we are alive
 	log.Trace("Announcing ourselves to the world")

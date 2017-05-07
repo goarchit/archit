@@ -143,6 +143,13 @@ func PeerDelete(p *util.Peer) error {
 	return nil
 }
 
+func PeerListExt() string {
+	if !util.IAmASeed {
+		return "Non-Seed nodes will not return a valid Peers List"
+	}
+	return PeerListAll()
+}
+
 func PeerListAll() string {
 	var encBuf bytes.Buffer
 	enc := gob.NewEncoder(&encBuf)
