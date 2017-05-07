@@ -36,6 +36,16 @@
         WalletUser = <the RPC user defined in imacredit.conf>
         WalletPassword = <the RPC password defined in imacredit.conf>
         
+    And... since we like to make life easy... you can use the "archit create" command to 
+    help you do so.  It will even query your wallet and create an address for you.
+    
+    Do an "archit create --help" for detail, but here is an example:
+
+    archit create --PortBase 3000 --WalletUser myrpcid --WalletPassword WayTooShort
+
+    Make sure you have your port number DNATed through your firewall to the machine
+    your running this on.
+
 8)  Do an "archit --help" to see options
 9)  Do an "archit farm" to start farming
 10) Have Fun!
