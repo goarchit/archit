@@ -116,7 +116,7 @@ func walletStatus() string {
 	}
 	// iterate over accounts (map[string]btcutil.Amount) and write to stdout
 	for label, amount := range accounts {
-		response += fmt.Sprint("Account balance ", label, amount, "\n")
+		response += fmt.Sprint("Account ", label, " balance: ",amount, "\n")
 	}
 	return response
 }
@@ -131,6 +131,6 @@ func walletGenerate() string {
 		log.Debug("Wallet Error getting new address for account",util.Account)
 		log.Critical(err)
 	}
-	log.Debug("WalletGenerate response:",response)
+	log.Debug("WalletGenerate response for account",util.Account,":",response)
 	return response.String()
 }

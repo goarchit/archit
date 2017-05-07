@@ -53,6 +53,7 @@ func (ec *CreateCommand) Execute(args []string) error {
 	util.LogLevel = config.Archit.LogLevel
 	util.ResetLog = config.Archit.ResetLog
 	util.Verbose = config.Archit.Verbose
+	util.Account = createCmd.Account
 	util.Raptor = createCmd.Raptor
 	util.PortBase = createCmd.PortBase
 	util.WalletIP = createCmd.WalletIP

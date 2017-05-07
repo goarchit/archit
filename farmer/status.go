@@ -14,7 +14,10 @@ func Status() string {
 	for _, v := range PeerMap.PL {
 		count++
 		// Limit screen output
-		if count > 50 { break }
+		if count > 100 { 
+			response += "..."
+			break 
+		}
 		response += v.IPAddr + " "
 	}
 	response += "\n\nInternal RPC Stats: "

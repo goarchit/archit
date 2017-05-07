@@ -110,6 +110,6 @@ func FlushPeerMap() error {
 	if err != nil {
 		return err
 	}
-	log.Console("Peer info flushed to database")
+	log.Console(len(PeerMap.PL)," Peers of info flushed to database")
 	return nil
 }
