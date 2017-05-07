@@ -65,7 +65,6 @@ func Run(c chan bool) {
 	// Now that RCP functions are defined, go gather DNS information
 	log.Trace("Gathering DNS information")
 	util.Dnsseed()
-	log.Debug("IAmASeed =",util.IAmASeed)
 
 	// Tell the world we are alive
 	log.Trace("Announcing ourselves to the world")

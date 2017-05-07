@@ -41,7 +41,9 @@ func Dnsseed() {
 	}
 	WG.Wait()
 
-	if !IAmASeed && len(aliveDNSes) == 0 {
+	log.Debug("IAmASeed =",IAmASeed,"len(aliveDNSes) =",len(aliveDNSes)
+
+	if !IAmASeed || len(aliveDNSes) > 0 {
 		log.Debug(len(aliveDNSes), "DNSes found alive")
 		rand.Seed(time.Now().UnixNano())
 		MyDNSServerIP = aliveDNSes[rand.Intn(len(aliveDNSes)-1)] + SeedPortBase
