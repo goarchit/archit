@@ -50,7 +50,7 @@ func DB(c chan string) {
 		if err != nil {
 			log.Critical("Error decoding PeerMap:", err)
 		}
-		log.Console(len(PeerMap.PL), "Peers now known")
+		log.Console(len(PeerMap.PL), "Peers loaded from persistant database")
 		log.Trace("PeerMap loaded:", PeerMap.PL)
 	} else {
 		log.Debug("PeerMap database was empty")

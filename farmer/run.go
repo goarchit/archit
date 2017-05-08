@@ -36,6 +36,7 @@ func Run(c chan bool) {
 	serverIP := ":" + strconv.Itoa(util.PortBase) // Listen on all interfaces
 	log.Info("Farmer External RPC Server using server address", serverIP)
 	extCmd = gorpc.NewTCPServer(serverIP, extRPC.NewHandlerFunc())
+	// And Launch!
 	err := extCmd.Start()
 	if err != nil {
 		log.Critical("Farmer External RPC service failed to start: ", err)

@@ -13,12 +13,15 @@ import (
 )
 
 func CheckPeers() {
+	util.WG.Add(len(PeerMap.PL))
 	for k,v := range PeerMap.PL {
 		go checkPeer(k,v)
 	}
+	util.WG.Wait()
 }
 
 func checkPeer(key string,peer util.Peer) {
+	defer util.WG.Done()
 	if key == "" {
 		log.Critical("checkPeer called with empty key")
 	}
@@ -64,5 +67,6 @@ func CheckWallet(serverIP string) string {
 	if !ok {
 		log.Critical("CheckWallet: WhoAreYou didn't return a string")
 	}
+	log.Trace("CheckWallet for",serverIP,"returned",str)
 	return str
 }
