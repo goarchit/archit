@@ -19,8 +19,12 @@ func CheckPeers() {
 }
 
 func checkPeer(key string,peer util.Peer) {
-	up := PingPeer(peer.IPAddr)
-	if up {
+	theirWalletAddr := CheckWallet(peer.IPAddr)
+	if key != theirWalletAddr {
+		PeerDelete(key)
+		return
+	}
+	if theirWalletAddr != "" {
 		PeerMap.mutex.Lock()
 		peer := PeerMap.PL[key]
 		peer.Reputation++
@@ -40,18 +44,22 @@ func checkPeer(key string,peer util.Peer) {
 	}
 }
 
-func PingPeer(serverIP string) bool {
+func CheckWallet(serverIP string) string {
 	c := gorpc.NewTCPClient(serverIP)
 	c.Start()
 	defer c.Stop()
 
         d := gorpc.NewDispatcher()
-        d.AddFunc("Ping", func() {})
+        d.AddFunc("WhoAreYou", func() {})
         dc := d.NewFuncClient(c)
-        _, err := dc.Call("Ping", nil)
+        res, err := dc.Call("Ping", nil)
         if err != nil {
-                log.Error("Ping of",serverIP,"failed: ", err)
-		return false
+                log.Error("CheckWallet for",serverIP,"failed: ", err)
+		return ""
         }
-	return true
+	str, ok := res.(string)
+	if !ok {
+		log.Critical("CheckWallet: WhoAreYou didn't return a string")
+	}
+	return str
 }

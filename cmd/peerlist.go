@@ -17,7 +17,7 @@ import (
 
 type PeerlistCommand struct {
 	PortBase int  `short:"B" long:"PortBase" description:"Primary port number of Archit serve   rs status is requested of" default:"1958" env:"ARCHIT_PORT"`
-	SortByIP bool `short:"S" long:"SortByIP" description:"Displays sorted by IP instead of the default sorting by Reputation"`
+	SortByRep bool `short:"S" long:"SortByRep" description:"Displays sorted by Reputation instead of the default sorting by IP Addr"`
 }
 
 var peerlistCmd PeerlistCommand
@@ -38,14 +38,14 @@ func (ec *PeerlistCommand) Execute(args []string) error {
 	port := util.PortBase +1
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	pl := util.GetPeerInfo(serverIP)
-	if peerlistCmd.SortByIP {
-		log.Console("Current peers by IP address:")
+	if !peerlistCmd.SortByRep {
+		log.Console("Current",len(pl),"peers by IP address:")
 		spl := SortPlByIP(pl)
 		for i := range spl {
 			log.Console("Peer",spl[i].IPAddr,"Rep:",spl[i].Reputation)
 		}
 	} else {
-		log.Console("Current peers by reputation:")
+		log.Console("Current",len(pl),"peers by reputation:")
 		spl := util.SortPl(pl)
 		for i := range spl {
 			log.Console("Peer",spl[i].IPAddr,"Rep:",spl[i].Reputation)

@@ -28,6 +28,7 @@ func Run(c chan bool) {
 	// External RPC service first
 	// Start by registering fucntions and types
 	extRPC.AddFunc("Ping", func() string { return "ePong!" })
+	extRPC.AddFunc("WhoAreYou", func() string {return util.WalletAddr})
 	extRPC.AddFunc("PeerAdd", func(pi *PeerInfo) string { return PeerAdd(pi) })
 	extRPC.AddFunc("PeerListAll", func() string { return PeerListExt() })
 
