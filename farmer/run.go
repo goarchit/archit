@@ -73,7 +73,7 @@ func Run(c chan bool) {
 
 	// Wait until told told to stop
 	<-c
-	log.Info("Farmer shutting down")
+	log.Info("Farmer process shutting down")
 
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Color("red")
@@ -97,4 +97,5 @@ func Run(c chan bool) {
 		s.Stop()
 		log.Console("Database(s) timed out - probably were not running.")
 	}
+	c<-true
 }

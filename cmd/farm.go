@@ -16,6 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"time"
 )
 
 type FarmCommand struct {
@@ -103,5 +104,11 @@ func (ec *FarmCommand) Execute(args []string) error {
 	<-c
 	log.Console("\nTrying a clean shutdown")
 	util.FarmerStop <- true
+	select {
+	case <-util.FarmerStop:
+		log.Console("Clean shutdown complete")
+	case <-time.After(10 * time.Second):
+		log.Console("Shutdown timed out")
+	}
 	return nil
 }

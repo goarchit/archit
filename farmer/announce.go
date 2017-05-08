@@ -81,6 +81,9 @@ func tellNode(pi *PeerInfo, nodeIP string) {
 	_, err := dc.Call("PeerAdd", pi)
 	if err != nil {
 		log.Warning("Announce to node", nodeIP, "failed:", err)
-		PeerDelete(pi.WalletAddr)
+		wa := FindNodeIP(nodeIP)
+		if wa != "" {
+			PeerDelete(wa)
+		}
 	}
 }
