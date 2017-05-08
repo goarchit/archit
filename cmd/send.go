@@ -11,6 +11,7 @@ import (
 	"github.com/goarchit/archit/db"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
+	"math"
 	"net"
 	"os"
 	"strconv"
@@ -18,11 +19,12 @@ import (
 )
 
 type SendCommand struct {
+        Account string `short:"A" long:"Account" description:"IMACredit wallet account name to use for payment" default:"Archit"`
  	Chaos 	bool   `short:"C" long:"Chaos" description:"Add a check for a random bit flip (chaos bit) after encoding and decoding - this doubles the computational load for sending data    and normally is seldom needed" env:"ARCHIT_CHAOS"`
 	Raptor  int    `short:"R" long:"Raptor" description:"Raptor factor - how many extra    fountain blocks to generate (4-12)" default:"8" env:"ARCHIT_RAPTOR" choice:"4" choice:"5" choice:"6" choice:"7" choice:"8" choice:"9" choice:"10" choice:"11" choice:"12"`
 	KeyPass string `short:"k" long:"KeyPass" description:"Your Key Passphase.  Recommend this be set in your archit configuration file" default:"insecure" env:"ARCHIT_KEYPASS"`
         KeyPIN  int    `short:"n" long:"KeyPIN" description:"Your personal identificatio number, used to encrypt KeyPass" default:"0" env:"ARCHIT_KEYPIN"`
-
+	FileName string `short:"F" long:"FileName" description:"File to send.  Will prompt if omitted" default:"" env:"ARCHIT_FILENAME"`
 }
 
 var sendCmd SendCommand
@@ -40,34 +42,73 @@ func (ec *SendCommand) Execute(args []string) error {
 	var block [32 * util.ShardLen]byte
 	var tblock [(32 + util.MaxRaptor) * util.ShardLen]byte
 	var iv [32 + util.MaxRaptor][aes.BlockSize]byte
-	// Go ahead and borrow file structures from the farmer codebase
 
-	log.Console("Starting Send Command")
+	util.Account = sendCmd.Account
+	util.Chaos = sendCmd.Chaos
+	util.Raptor = sendCmd.Raptor
+	util.KeyPass = sendCmd.KeyPass
+	util.KeyPIN = sendCmd.KeyPIN
+	log.Console("KeyPIN =",util.KeyPIN)
+	fileName := sendCmd.FileName
 	config.Conf(true) // Get the PIN and derive the key
-
-	db.Open()
-	defer db.Close()
-	log.Trace("Database open")
-
-        port := util.PortBase + 1
-        serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
-	pl := util.GetPeerInfo(serverIP)
-	log.Console("Potential Peers:",pl)
-
-	filename := "LICENSE.md"
-	db.FileInfo.Filename = []byte(filename)
+	if sendCmd.Chaos {
+		log.Warning("Chaos option ignored, not implemented yet")
+	}
+	// Go grab the filename if not passed as a parameter
+	if sendCmd.FileName == "" {
+		fmt.Printf("Name of file to be sent: ")
+		_, err := fmt.Scanf("%s",&fileName)
+		if err != nil {
+			log.Critical("Error entering file name:",err)
+		} 
+	}
+	fileName = util.FullPath(fileName)
+	// And check if it exists!
+	db.FileInfo.Filename = []byte(fileName)
 	db.FileInfo.UploadTime = time.Now()
-	f, err := os.Open(filename)
+	f, err := os.Open(fileName)
 	if err != nil {
 		log.Critical(err)
 	} else {
-		log.Trace("Reading", filename)
+		log.Trace("Attempting to send", fileName)
 	}
+	fileInfo, err := f.Stat()
+	if err != nil {
+		log.Critical("Unexpected error Stat()ing file since its already open!",err)
+	}
+	blockCount := math.Ceil(float64(fileInfo.Size())/float64(util.GB))
+	log.Info("About to send",blockCount,"file slices")
+
+	// Grab peers we can send too..
+        port := util.PortBase + 1
+        serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
+	pl := util.GetPeerInfo(serverIP)
+	log.Debug("Sending of",fileName,"Potential Peers:",len(pl))
+	if len(pl) < (32+util.Raptor)  {
+		log.Critical("Only",len(pl),"Farmers known.  Not enough to function")
+	}
+	if len(pl) < (42+util.Raptor) {
+		log.Warning("Only",len(pl),"Farmers known... sending may fail if at least",32+util.Raptor,"are not online")
+	} else {
+		if len(pl) < (int(blockCount)*(32+util.Raptor)) {
+			log.Warning("Only",len(pl),"Farmers known... some farmers will receive multiple shards (which is ok, just not ideal)")
+		}
+	}
+
+	log.Trace("UnSorted pl:",pl)
+	spl := util.SortPl(pl)
+	log.Debug("Sorted pl:",spl)
+
+	db.Open()
+	defer db.Close()
+	log.Trace("Send command database open")
+
+
 	n1, err := f.Read(block[:])
 	if err != nil {
 		log.Critical(err)
 	}
-	log.Trace("Read:", n1, "bytes read")
+	log.Info("Read:", n1, "bytes read from",fileName)
 	// Initial tblock
 	copy(tblock[:32*util.ShardLen-1], string(block[:]))
 	copy(tblock[32*util.ShardLen:32*util.ShardLen+32*util.Raptor], string(block[:]))
@@ -78,7 +119,7 @@ func (ec *SendCommand) Execute(args []string) error {
 		log.Critical(err)
 	}
 	key := fmt.Sprintf("%x", hash)
-	log.Trace("Filename:", key)
+	log.Info("Filename for farmers:", key)
 	util.SliceName = key
 	// Encode
 	log.Trace("Encoding starting")

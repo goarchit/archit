@@ -15,6 +15,7 @@ func CronHourly() {
 		t := time.NewTimer(1 * time.Hour)
 		<-t.C
 		FlushPeerMap()	//  Update the PeerMap in the bolt database
+		CheckPeers()	//  Adjust reputation of peers that don't Ping
 	}
 }
 

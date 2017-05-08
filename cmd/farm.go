@@ -85,7 +85,8 @@ func (ec *FarmCommand) Execute(args []string) error {
 		}
 	}
 	if thresshold > 0 {
-		log.Console(thresshold, " bytes of space left before uploads will be rejected")
+		left := math.Floor(float64(thresshold)/1024/1024)*100 + 0.5
+		log.Console(math.Floor(left)/100, "Farmable megabytes left in",util.DataDir)
 	} else {
 		log.Console("All uploads will be rejectred due to lack of free space")
 	}

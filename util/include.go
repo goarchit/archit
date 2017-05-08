@@ -9,8 +9,8 @@ import (
 )
 
 const GB uint64 = 1024*1024*1024
-const MaxRaptor int = 12
-const ShardLen int = 1024
+const MaxRaptor = 12
+const ShardLen = 32*1024*1024
 const SeedPortBase  = ":1958"
 const OutOfHops = "Out of Hops"
 const FileDBName = "FileInfo.bolt"
@@ -63,6 +63,12 @@ type Peer struct {
 }
 
 type PeerList map[string]Peer // Indexed by Wallet Address
+
+type SortedPeer struct {
+        Reputation int64  // sort key
+        WalletAddr string
+        IPAddr  string
+        }
 
 func init() {
 	FarmerStop = make(chan bool)

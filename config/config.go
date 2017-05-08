@@ -73,10 +73,10 @@ func Conf(needKey bool) {
 
 	value, err := conf.GetValue("", "DBDir")
 	if err == nil {
-		log.Debug("DBDir found in configuration file")
+		log.Trace("DBDir found in configuration file")
 		o := Parser.FindOptionByLongName("DBDir")
 		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", Archit.DBDir)
+			log.Trace("Configuration value of", value, "overriding default value", Archit.DBDir)
 			Archit.DBDir = value
 		}
 	}
@@ -84,13 +84,13 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "LogFile")
 	if err == nil {
-		log.Debug("Value of LogFile from config file:", value)
+		log.Trace("Value of LogFile from config file:", value)
 		o := Parser.FindOptionByLongName("LogFile")
 		if o == nil {
 			log.Critical("Internal Parser error finding LogFile")
 		}
 		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.LogFile)
+			log.Trace("Configuration value of", value, "overriding default value", util.LogFile)
 			util.LogFile = value
 			log.Setup(util.LogLevel, util.LogFile, util.Verbose, util.ResetLog)
 		}
@@ -98,13 +98,13 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "LogLevel")
 	if err == nil {
-		log.Debug("Value of LogLevel from config file:", value)
+		log.Trace("Value of LogLevel from config file:", value)
 		o := Parser.FindOptionByLongName("LogLevel")
 		if o == nil {
 			log.Critical("Internal Parser error finding LogLevel")
 		}
 		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.LogLevel)
+			log.Trace("Configuration value of", value, "overriding default value", util.LogLevel)
 			util.LogLevel, err  = strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
@@ -115,13 +115,13 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "ResetLog")
 	if err == nil {
-		log.Debug("Value of ResetLog from config file:", value)
+		log.Trace("Value of ResetLog from config file:", value)
 		o := Parser.FindOptionByLongName("ResetLog")
 		if o == nil {
 			log.Critical("Internal Parser error finding ResetLog")
 		}
 		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.ResetLog)
+			log.Trace("Configuration value of", value, "overriding default value", util.ResetLog)
 			rl, err := strconv.ParseBool(value)
 			if err != nil {
 				log.Critical("Error in conf file, ResetLog =",err)
@@ -133,13 +133,13 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "Verbose")
 	if err == nil {
-		log.Debug("Value of Verbose from config file:", value)
+		log.Trace("Value of Verbose from config file:", value)
 		o := Parser.FindOptionByLongName("Verbose")
 		if o == nil {
 			log.Critical("Internal Parser error finding Verbose")
 		}
 		if o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.Verbose)
+			log.Trace("Configuration value of", value, "overriding default value", util.Verbose)
 			util.Verbose, err  = strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
@@ -158,10 +158,10 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "PortBase")
 	if err == nil {
-		log.Debug("Value of Port from config file:", value)
+		log.Trace("Value of Port from config file:", value)
 		o := Parser.FindOptionByLongName("PortBase")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.PortBase)
+			log.Trace("Configuration value of", value, "overriding default value", util.PortBase)
 			util.PortBase, err = strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
@@ -186,10 +186,10 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "Raptor")
 	if err == nil {
-		log.Debug("Value of Raptor from config file:", value)
+		log.Trace("Value of Raptor from config file:", value)
 		o := Parser.FindOptionByLongName("Raptor")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.Raptor)
+			log.Trace("Configuration value of", value, "overriding default value", util.Raptor)
 			util.Raptor, err = strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
@@ -199,14 +199,14 @@ func Conf(needKey bool) {
 	util.Raptor = util.Raptor
 	value, err = conf.GetValue("", "KeyPass")
 	if err == nil {
-		log.Debug("Value of KeyPass from config file:", value)
+		log.Trace("Value of KeyPass from config file:", value)
 		o := Parser.FindOptionByLongName("KeyPass")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.KeyPass)
+			log.Trace("Configuration value of", value, "overriding default value", util.KeyPass)
 			util.KeyPass = value
 		}
 	} else {
-		log.Debug("KeyPass value NOT specified by config file")
+		log.Trace("KeyPass value NOT specified by config file")
 		o := Parser.FindOptionByLongName("KeyPass")
 		if o == nil || o.IsSetDefault() {
 			log.Critical("KeyPass value must be set!")
@@ -218,14 +218,15 @@ func Conf(needKey bool) {
 		// If a user REALLY wants to record it, they can do so as an ENV variable
 		o := Parser.FindOptionByLongName("KeyPIN")
 		if o == nil || o.IsSetDefault() {
+			if util.KeyPIN == 0 {  //go-flag bug work aroundjj
 			var ivalue int
-			log.Debug("KeyPIN value being asked of invoker")
-			fmt.Printf("Please enter you KeyPIN: ")
+			fmt.Printf("Default KeyPIN not allowed, please enter a KeyPIN: ")
 			_, err := fmt.Scanf("%d", &ivalue)
 			if err != nil {
 				log.Critical("Error getting KeyPin:", err)
 			}
 			util.KeyPIN = ivalue
+			}
 		}
 		// Generate and save DevivedKey
 		util.DerivedKey, err = scrypt.Key([]byte(util.KeyPass), []byte(strconv.Itoa(util.KeyPIN)), 16384, 8, 1, 32)
@@ -237,10 +238,10 @@ func Conf(needKey bool) {
 
 	value, err = conf.GetValue("", "WalletAddr")
 	if err == nil {
-		log.Debug("Value of WalletAddr from config file:", value)
+		log.Trace("Value of WalletAddr from config file:", value)
 		o := Parser.FindOptionByLongName("WalletAddr")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.WalletAddr)
+			log.Trace("Configuration value of", value, "overriding default value", util.WalletAddr)
 			util.WalletAddr = value
 		}
 	} else {
@@ -254,19 +255,19 @@ func Conf(needKey bool) {
 	}
 	value, err = conf.GetValue("", "WalletIP")
 	if err == nil {
-		log.Debug("Value of WalletIP from config file:", value)
+		log.Trace("Value of WalletIP from config file:", value)
 		o := Parser.FindOptionByLongName("WalletIP")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.WalletIP)
+			log.Trace("Configuration value of", value, "overriding default value", util.WalletIP)
 			util.WalletIP = value
 		}
 	}
 	value, err = conf.GetValue("", "WalletPort")
 	if err == nil {
-		log.Debug("Value of WalletPort from config file:", value)
+		log.Trace("Value of WalletPort from config file:", value)
 		o := Parser.FindOptionByLongName("WalletPort")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.WalletPort)
+			log.Trace("Configuration value of", value, "overriding default value", util.WalletPort)
 			util.WalletPort, err = strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
@@ -275,10 +276,10 @@ func Conf(needKey bool) {
 	}
 	value, err = conf.GetValue("", "WalletUser")
 	if err == nil {
-		log.Debug("Value of WalletUser from config file:", value)
+		log.Trace("Value of WalletUser from config file:", value)
 		o := Parser.FindOptionByLongName("WalletUser")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.WalletUser)
+			log.Trace("Configuration value of", value, "overriding default value", util.WalletUser)
 			util.WalletUser = value
 		}
 	} else {
@@ -292,10 +293,10 @@ func Conf(needKey bool) {
 	}
 	value, err = conf.GetValue("", "WalletPassword")
 	if err == nil {
-		log.Debug("WalletPassword found in configuration file")
+		log.Trace("WalletPassword found in configuration file")
 		o := Parser.FindOptionByLongName("WalletPassword")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of WalletPassword overriding default value")
+			log.Trace("Configuration value of WalletPassword overriding default value")
 			util.WalletPassword = value
 		}
 	} else {
@@ -309,10 +310,10 @@ func Conf(needKey bool) {
 	}
 	value, err = conf.GetValue("", "MinFreeSpace")
 	if err == nil {
-		log.Debug("Value of MinFreeSpace from config file:", value)
+		log.Trace("Value of MinFreeSpace from config file:", value)
 		o := Parser.FindOptionByLongName("MinFreeSpace")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.MinFreeSpace)
+			log.Trace("Configuration value of", value, "overriding default value", util.MinFreeSpace)
 			minFreeSpace, err := strconv.Atoi(value)
 			if err != nil {
 				log.Critical(err)
@@ -322,10 +323,10 @@ func Conf(needKey bool) {
 	}
 	value, err = conf.GetValue("", "DataDir")
 	if err == nil {
-		log.Debug("Value of DataDir from config file:", value)
+		log.Trace("Value of DataDir from config file:", value)
 		o := Parser.FindOptionByLongName("DataDir")
 		if o == nil || o.IsSetDefault() {
-			log.Debug("Configuration value of", value, "overriding default value", util.DataDir)
+			log.Trace("Configuration value of", value, "overriding default value", util.DataDir)
 			util.DataDir = value
 		}
 	}
@@ -342,5 +343,5 @@ func Conf(needKey bool) {
 		log.Console("Generating security keys")
 		util.RSAGenerate(private,public)
 	}
-	log.Debug("Wrapping up config.Conf(needKey), needKey:", needKey)
+	log.Trace("Wrapping up config.Conf(needKey), needKey:", needKey)
 }

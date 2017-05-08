@@ -65,8 +65,11 @@ func (ec *SettingsCommand) Execute(args []string) error {
 	}
 	log.Console("Settings potentially from the conf file, passed flags, or ENV variables:\n")
 	log.Console("Core Settings:")
+	log.Console("    Account =",util.Account)
 	log.Console("    Conf =",util.Conf)
 	log.Console("    DBDir =",util.DBDir)
+	log.Console("	 DataDir =",util.DataDir)
+	log.Console("	 MinFreeSpace =",util.MinFreeSpace)
 	log.Console("    LogFile =",util.LogFile)
 	log.Console("    LogLevel =",util.LogLevel)
 	log.Console("    ResetLog =",util.ResetLog)

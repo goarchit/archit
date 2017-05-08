@@ -30,6 +30,9 @@ type CreateCommand struct {
 	WalletPassword string `long:"WalletPassword" short:"W" description:"IMACredit Wallet's RPCPassword settting.  HIGHLY recommend this be set in your archit configuration file" required:"Y"`
 	Pretend        bool   `short:"p" long:"Pretend" description:"Display results instead of actually creating the configuration file"`
 	Silent	bool	`short:"s" long:"Silent" description:"Do not display contents of configuration file while creating"`
+        MinFreeSpace   int    `long:"MinFreeSpace" short:"M" default:"256" description:"Minimum     free space in GB to maintain in data directory" env:"ARCHIT_MINFREESPACE"`
+        DataDir        string `long:"DataDir" short:"D" default:"~/ArchitData" description:"Dire    ctory farmed data should be stored in" env:"ARCHIT_DATADIR"`
+
 }
 
 var createCmd CreateCommand
@@ -46,20 +49,20 @@ func (ec *CreateCommand) Execute(args []string) error {
 	var walletCmd = make(chan string)
 	var f *os.File
 
-	util.Conf = util.FullPath(config.Archit.Conf)
+	// Unlike most command with parameters, Create never call Config() to parse the 
+	// configuration file.  This makes sense, since its primary usage is to create
+	// just that configuartion file.  As such, there is no need to assign most of the
+	// util.xyz variables.  
 
-	util.DBDir = config.Archit.DBDir
-	util.LogFile = config.Archit.LogFile
-	util.LogLevel = config.Archit.LogLevel
-	util.ResetLog = config.Archit.ResetLog
-	util.Verbose = config.Archit.Verbose
-	util.Account = createCmd.Account
-	util.Raptor = createCmd.Raptor
-	util.PortBase = createCmd.PortBase
+	util.Conf = util.FullPath(config.Archit.Conf)
+	util.KeyPass = pwordgen.NewPassword(80)
+	// Set for Wallet usage
+	util.Account = createCmd.Account  
 	util.WalletIP = createCmd.WalletIP
 	util.WalletPort = createCmd.WalletPort
 	util.WalletUser = createCmd.WalletUser
 	util.WalletPassword = createCmd.WalletPassword
+
 	if createCmd.Pretend {
 		log.Console("Pretending!  Would create", util.Conf)
 	} else {
@@ -76,15 +79,17 @@ func (ec *CreateCommand) Execute(args []string) error {
 		}
 		defer f.Close()
 	}
-	util.KeyPass = pwordgen.NewPassword(80)
+	write(f, "Acocunt = "+util.Account)
+	write(f, "DBDir = "+config.Archit.DBDir)
+	write(f, "DataDir = "+createCmd.DataDir)
+	write(f, "MinFreeSpace = "+strconv.Itoa(createCmd.MinFreeSpace))
+	write(f, "Raptor = "+strconv.Itoa(createCmd.Raptor))
+	write(f, "LogFile = "+config.Archit.LogFile)
+	write(f, "LogLevel = "+strconv.Itoa(config.Archit.LogLevel))
+	write(f, "ResetLog = "+strconv.FormatBool(config.Archit.ResetLog))
+	write(f, "Verbose = "+strconv.Itoa(config.Archit.Verbose))
+	write(f, "PortBase = "+strconv.Itoa(createCmd.PortBase))
 	write(f, "KeyPass = "+util.KeyPass)
-	write(f, "DBDir = "+util.DBDir)
-	write(f, "Raptor = "+strconv.Itoa(util.Raptor))
-	write(f, "LogFile = "+util.LogFile)
-	write(f, "LogLevel = "+strconv.Itoa(util.LogLevel))
-	write(f, "ResetLog = "+strconv.FormatBool(util.ResetLog))
-	write(f, "Verbose = "+strconv.Itoa(util.Verbose))
-	write(f, "PortBase = "+strconv.Itoa(util.PortBase))
 	write(f, "WalletIP = "+util.WalletIP)
 	write(f, "WalletPort = "+strconv.Itoa(util.WalletPort))
 	write(f, "WalletUser = "+util.WalletUser)
@@ -108,6 +113,7 @@ func (ec *CreateCommand) Execute(args []string) error {
 			return errors.New("Create complete except for WalletAddr =")
 		}
 		util.WalletAddr = <-walletCmd
+		write(f, "WalletAddr = "+util.WalletAddr)
 
 		// Try a clean shutdown
 		select {
@@ -116,7 +122,6 @@ func (ec *CreateCommand) Execute(args []string) error {
 			log.Console("Odd, IMACredit Wallet timed out - probably wasn't running.")
 		}
 
-		write(f, "WalletAddr = "+util.WalletAddr)
 	}
 	return nil
 }

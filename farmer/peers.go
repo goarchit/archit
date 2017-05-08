@@ -107,7 +107,7 @@ func PeerAdd(pi *PeerInfo) string {
 		pm.PublicKey = pi.Detail.PublicKey
 		pm.IPAddr = pi.Detail.IPAddr
 		pm.MacAddr = pi.Detail.MacAddr
-		pm.Reputation = 0
+		pm.Reputation = 0	// Minimum reptuatio
 		PeerMap.mutex.Lock()
 		PeerMap.PL[pi.WalletAddr] = pm
 		PeerMap.mutex.Unlock()
@@ -139,7 +139,11 @@ func PeerAdd(pi *PeerInfo) string {
 	return ""
 }
 
-func PeerDelete(p *util.Peer) error {
+func PeerDelete(key string) error {
+	log.Info("Deleting farmer at ",PeerMap.PL[key].IPAddr,"from PeerMap")
+	PeerMap.mutex.Lock()
+	delete(PeerMap.PL, key)
+	PeerMap.mutex.Unlock()
 	return nil
 }
 

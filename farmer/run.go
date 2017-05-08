@@ -47,7 +47,7 @@ func Run(c chan bool) {
 	intRPC.AddFunc("Ping", func() string { return "iPong!" })
 	intRPC.AddFunc("Status", func() string { return Status() })
 	// intRPC.AddFunc("PeerAdd", func(pi *PeerInfo) error {return PeerAdd(wa,p)})
-	intRPC.AddFunc("PeerDelete", func(p *util.Peer) error { return PeerDelete(p) })
+	intRPC.AddFunc("PeerDelete", func(key string) error { return PeerDelete(key) })
 	intRPC.AddFunc("PeerListAll", func() string { return PeerListAll() })
 	intRPC.AddFunc("PeerDBSync", func() error { return FlushPeerMap() })
 
