@@ -19,6 +19,9 @@ func CheckPeers() {
 }
 
 func checkPeer(key string,peer util.Peer) {
+	if key == "" {
+		log.Critical("checkPeer called with empty key")
+	}
 	theirWalletAddr := CheckWallet(peer.IPAddr)
 	if key != theirWalletAddr {
 		PeerDelete(key)

@@ -103,14 +103,15 @@ func PeerAdd(pi *PeerInfo) string {
 	} else {
 		log.Info("Received new peer",pi.WalletAddr,"information from",pi.SenderIP)
 		// Only allow the public key to be stored the first time
-		pm := PeerMap.PL[pi.WalletAddr]
-		pm.PublicKey = pi.Detail.PublicKey
-		pm.IPAddr = pi.Detail.IPAddr
-		pm.MacAddr = pi.Detail.MacAddr
-		pm.Reputation = 0	// Minimum reptuatio
+		peer := PeerMap.PL[pi.WalletAddr]
+		peer.PublicKey = pi.Detail.PublicKey
+		peer.IPAddr = pi.Detail.IPAddr
+		peer.MacAddr = pi.Detail.MacAddr
+		peer.Reputation = 0	// Minimum reptuatio
 		PeerMap.mutex.Lock()
-		PeerMap.PL[pi.WalletAddr] = pm
+		PeerMap.PL[pi.WalletAddr] = peer
 		PeerMap.mutex.Unlock()
+		log.Trace("WalletAddr",pi.WalletAddr,"set to",peer.IPAddr)
 	}
 
 	// If your a seed, do your duty and tell everyone
@@ -140,7 +141,10 @@ func PeerAdd(pi *PeerInfo) string {
 }
 
 func PeerDelete(key string) error {
-	log.Info("Deleting farmer at ",PeerMap.PL[key].IPAddr,"from PeerMap")
+	if key == "" {
+		log.Critical("PeerDelete called with empty key")
+	}
+	log.Info("Deleting farmer",key,"at",PeerMap.PL[key].IPAddr,"from PeerMap")
 	PeerMap.mutex.Lock()
 	delete(PeerMap.PL, key)
 	PeerMap.mutex.Unlock()
