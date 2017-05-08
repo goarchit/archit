@@ -58,7 +58,7 @@ func CheckWallet(serverIP string) string {
         d := gorpc.NewDispatcher()
         d.AddFunc("WhoAreYou", func() {})
         dc := d.NewFuncClient(c)
-        res, err := dc.Call("Ping", nil)
+        res, err := dc.Call("WhoAreYou", nil)
         if err != nil {
                 log.Error("CheckWallet for",serverIP,"failed: ", err)
 		return ""

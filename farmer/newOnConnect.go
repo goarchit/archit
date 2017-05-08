@@ -1,4 +1,6 @@
-// Weird little function that is part of GoRPC, just having it defined gets it called
+//  Try and prevent spamming by limiting the number of request to once every 10 seconds
+//  (unless someeone else connects)
+//  This function is only set for External connectionings in run.go
 package farmer
 
 import (
