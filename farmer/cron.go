@@ -20,6 +20,9 @@ func CronHourly() {
 		if err != nil {
 			log.Error("Hourly Cron unable to FlushPeerMap:",err)
 		}
+		//  Just in caser you were offline for a bit, like if your internet went
+		//  down...
+		go announce()
 	}
 }
 

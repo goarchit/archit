@@ -40,8 +40,8 @@ func (ec *PeerinfoCommand) Execute(args []string) error {
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	pl := util.GetPeerInfo(serverIP)
 	if peerinfoCmd.Raw {
-		for i := range pl {
-			log.Console("Peer",pl[i].IPAddr,"Rep:",pl[i].Reputation)
+		for key,v := range pl {
+			log.Console("Peer",v.IPAddr,"Rep:",v.Reputation,"WalletAddr:",key)
 		}
 	} else if !peerinfoCmd.SortByRep {
 		if !peerinfoCmd.Raw {
@@ -49,7 +49,7 @@ func (ec *PeerinfoCommand) Execute(args []string) error {
 		}
 		spl := SortPlByIP(pl)
 		for i := range spl {
-			log.Console("Peer",spl[i].IPAddr,"Rep:",spl[i].Reputation)
+			log.Console("Peer",spl[i].IPAddr,"Rep:",spl[i].Reputation,"WalletAddr:",spl[i].WalletAddr)
 		}
 	} else {
 		if !peerinfoCmd.Raw {
@@ -57,7 +57,7 @@ func (ec *PeerinfoCommand) Execute(args []string) error {
 		}
 		spl := util.SortPl(pl)
 		for i := range spl {
-			log.Console("Peer",spl[i].IPAddr,"Rep:",spl[i].Reputation)
+			log.Console("Peer",spl[i].IPAddr,"Rep:",spl[i].Reputation,"WalletAddr:",spl[i].WalletAddr)
 		}
 	}
 

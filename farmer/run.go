@@ -74,6 +74,11 @@ func Run(c chan bool) {
 	// Tell the world we are alive
 	log.Trace("Announcing ourselves to the world")
 	go announce()
+        if util.IAmASeed {
+                log.Console("Waiting for farmers to join the network")
+        } else {
+                log.Console("Farmer node startup complete!")
+        }
 
 	// Wait until told told to stop
 	<-c

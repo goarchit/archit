@@ -59,11 +59,6 @@ func announce() {
 	log.Trace("Calling PeerListAll at seed", util.MyDNSServerIP)
 	newPL = util.GetPeerInfo(util.MyDNSServerIP)
 	peerListAdd(newPL)
-	if util.IAmASeed {
-		log.Console("Waiting for farmers to join the network")
-	} else {
-		log.Console("Farmer node startup complete!")
-	}
 }
 
 func tellNode(pi *PeerInfo, nodeIP string) {
