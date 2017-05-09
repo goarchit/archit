@@ -18,6 +18,7 @@ var intCmd *gorpc.Server
 var extCmd *gorpc.Server
 
 func Run(c chan bool) {
+	var response string
 
 	// Start common services
 	if !util.IAmASeed && !util.SeedMode {
@@ -83,22 +84,27 @@ func Run(c chan bool) {
 	s.Reverse()
 
 	log.Console("Trying to stop Wallet...")
+	walletCmd <- "stop"
 	s.Start()
 	select {
-	case walletCmd <- "stop":
+	case response = <- walletCmd:
 		s.Stop()
 	case <-time.After(5 * time.Second):
 		s.Stop()
-		log.Console("Wallet timed out - probably wasn't running.")
+		response = "Wallet timed out - probably wasn't running."
 	}
-	log.Console("Trying to stop Databases...")
+	log.Console(response)
+	log.Console("Trying to stop Database...")
+	dbCmd <- "stop"
 	s.Start()
 	select {
-	case dbCmd <- "stop":
+	case response = <- dbCmd:
 		s.Stop()
 	case <-time.After(5 * time.Second):
 		s.Stop()
-		log.Console("Database(s) timed out - probably were not running.")
+		response = "Database(s) timed out - probably were not running."
 	}
+	log.Console(response)
+	log.Info("Farmer process shutdown complete")
 	c<-true
 }

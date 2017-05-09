@@ -15,8 +15,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/goarchit/archit/log"
 	"github.com/goarchit/archit/util"
-	"time"
 	"path/filepath"
+	"time"
 )
 
 const PeersBucket = "PeersBucket"
@@ -28,7 +28,7 @@ func DB(c chan string) {
 	var peerbytes bytes.Buffer
 
 	// Start the DBs
-	dbName := filepath.Join(util.DBDir,util.PeerDBName)
+	dbName := filepath.Join(util.DBDir, util.PeerDBName)
 	peersDB, err = bolt.Open(dbName, 0600, &bolt.Options{Timeout: 2 * time.Second})
 	if err != nil {
 		log.Critical("DB Error opening PeerInfo.bolt:", err)
@@ -71,8 +71,13 @@ func DB(c chan string) {
 		}
 		cmd = <-c
 	}
-	FlushPeerMap()
-	c <- "DB shutdown complete"
+	err := FlushPeerMap()
+	if err != nil {
+		log.Error("Error in FlushPeerMap while shutting down:", err)
+	}
+	//  Yeah, yeah... the defer close might take effect before the caller exits, maybe...
+	peersDB.Close()	
+	c <- "Database shutdown complete"
 }
 
 func dbStatus() string {
@@ -90,26 +95,25 @@ func FlushPeerMap() error {
 		if b == nil {
 			log.Critical("Error accessing bucket:", PeersBucket)
 		}
-		log.Trace("PeerInfo.Bolt:  Updating PeerMap")
+		log.Trace("FlushPeerMap:  Updating PeerMap")
 		enc := gob.NewEncoder(&encBuf)
 		err := enc.Encode(PeerMap.PL)
 		if err != nil {
-			log.Critical("DB: PeerMap Encode err:", err)
+			log.Critical("FlushPeerMap: PeerMap Encode err:", err)
 		}
 		log.Trace("Gob len=", len(encBuf.String()))
 		err = b.Put([]byte("PeerMap"), encBuf.Bytes())
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	})
 	if err != nil {
+		log.Error("FlushPeerMap Update error:",err)
 		return err
 	}
 	err = peersDB.Sync()
 	if err != nil {
+		log.Error("FlushPeerMap Sync error:",err)
 		return err
 	}
-	log.Info("Information on",len(PeerMap.PL),"Peers flushed to persistant database")
+	log.Info("Information on", len(PeerMap.PL), "Peers flushed to persistant database")
 	return nil
 }

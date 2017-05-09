@@ -1,4 +1,4 @@
-// Peerlist command - Provides a formated list of all peers
+// Peerinfo command - Provides a formated list of all peers
 // Originally work created on 5/7/2017
 //
 
@@ -15,30 +15,30 @@ import (
 	"strconv"
 )
 
-type PeerlistCommand struct {
+type PeerinfoCommand struct {
 	PortBase int  `short:"B" long:"PortBase" description:"Primary port number of Archit serve   rs status is requested of" default:"1958" env:"ARCHIT_PORT"`
-	SortByRep bool `short:"S" long:"SortByRep" description:"Displays sorted by Reputation instead of the default sorting by IP Addr"`
+	SortByRep bool `short:"S" long:"SortByRep" description:"Displays sorted by Reputation instead of the default sorting by IP Address"`
 }
 
-var peerlistCmd PeerlistCommand
+var peerinfoCmd PeerinfoCommand
 
 func init() {
-	_,err := config.Parser.AddCommand("peerlist", "Provides a formated list of peer IPs and their reputations", "", &peerlistCmd)
+	_,err := config.Parser.AddCommand("peerinfo", "Provides a formated list of peer information", "", &peerinfoCmd)
         if err != nil {
                 fmt.Println("Internal error parsing PeerList command:",err)
                 os.Exit(1)
         }
 }
 
-func (ec *PeerlistCommand) Execute(args []string) error {
+func (ec *PeerinfoCommand) Execute(args []string) error {
 
-	util.PortBase = peerlistCmd.PortBase
+	util.PortBase = peerinfoCmd.PortBase
 	config.Conf(false)
 
 	port := util.PortBase +1
 	serverIP := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
 	pl := util.GetPeerInfo(serverIP)
-	if !peerlistCmd.SortByRep {
+	if !peerinfoCmd.SortByRep {
 		log.Console("Current",len(pl),"peers by IP address:")
 		spl := SortPlByIP(pl)
 		for i := range spl {

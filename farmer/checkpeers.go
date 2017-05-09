@@ -44,7 +44,7 @@ func checkPeer(key string,peer util.Peer) {
 		PeerMap.PL[key] = peer
 		PeerMap.mutex.Unlock()
 		log.Trace("Reputation of",peer.IPAddr,"decreased by 5")
-		if PeerMap.PL[key].Reputation < 0 {
+		if peer.Reputation < 0 {
 			PeerDelete(key)
 		}
 	}

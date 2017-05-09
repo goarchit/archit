@@ -83,7 +83,14 @@ func tellNode(pi *PeerInfo, nodeIP string) {
 		log.Warning("Announce to node", nodeIP, "failed:", err)
 		wa := FindNodeIP(nodeIP)
 		if wa != "" {
-			PeerDelete(wa)
+			PeerMap.mutex.Lock()
+			peer := PeerMap.PL[wa]
+			peer.Reputation -= 5
+			PeerMap.PL[wa] = peer
+			PeerMap.mutex.Unlock()
+			if peer.Reputation < 0 {
+				PeerDelete(wa)
+			}
 		}
 	}
 }

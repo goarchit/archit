@@ -12,10 +12,14 @@ func CronHourly() {
 	log.Trace("Internal CronHourly() called")
 	// loop forever //
 	for {
+		//  Note this code actually occures every (hour+processing time)
 		t := time.NewTimer(1 * time.Hour)
 		<-t.C
 		CheckPeers()	//  Adjust reputation of peers that don't Ping
-		FlushPeerMap()	//  Update the PeerMap in the bolt database
+		err := FlushPeerMap()	//  Update the PeerMap in the bolt database
+		if err != nil {
+			log.Error("Hourly Cron unable to FlushPeerMap:",err)
+		}
 	}
 }
 
