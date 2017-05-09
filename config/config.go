@@ -53,6 +53,7 @@ func Conf(needKey bool) {
 	conf, err := goconfig.LoadConfigFile(util.Conf)
 	if err != nil {
 		// Something is wrong, generate a good configuration file
+		log.Error("Error reading configuration file",util.Conf,":",err)
 		genGoodConfig()
 		conf, err = goconfig.LoadConfigFile(util.Conf)
 		if err != nil {

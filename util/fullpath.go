@@ -14,7 +14,6 @@ func FullPath(path string) string {
                 usr, _ := user.Current()
                 dir := usr.HomeDir + "/"  //  This is unix specific, so "/" is safe
                 fullpath = strings.Replace(path, "~/", dir, 1)
-
         }
 	fullpath,err := filepath.Abs(fullpath)
 	if err != nil {

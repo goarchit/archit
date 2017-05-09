@@ -79,7 +79,7 @@ func (ec *CreateCommand) Execute(args []string) error {
 		}
 		defer f.Close()
 	}
-	write(f, "Acocunt = "+util.Account)
+	write(f, "Account = "+util.Account)
 	write(f, "DBDir = "+config.Archit.DBDir)
 	write(f, "DataDir = "+createCmd.DataDir)
 	write(f, "MinFreeSpace = "+strconv.Itoa(createCmd.MinFreeSpace))
